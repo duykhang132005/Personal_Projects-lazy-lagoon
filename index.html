@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#041018" />
+  <meta name="description" content="Lazy Lagoon - neon arcade: Snake, Minesweeper, Tic-Tac-Toe, Sudoku" />
+  <title>Lazy Lagoon</title>
+  <link rel="icon" href="assets/favicon.svg?v=4" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <canvas id="lake-bg" aria-hidden="true"></canvas>
+  <a class="sr-only" href="#main">Skip to content</a>
+
+  <div class="app-shell">
+    <header class="site-header">
+      <button type="button" class="brand" id="brand-home" aria-label="Lazy Lagoon home">
+        <img class="brand-mark" src="assets/favicon.svg?v=4" width="40" height="40" alt="" />
+        <span class="brand-title">Lazy Lagoon</span>
+      </button>
+      <div class="header-actions">
+        <button type="button" class="btn btn-ghost" id="btn-leaderboard">Leaderboard</button>
+        <button type="button" class="btn btn-ghost" id="btn-back" hidden>&lt;- Lobby</button>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- LOBBY -->
+      <section id="view-lobby" class="view active" aria-label="Game lobby">
+        <div class="lobby-hero">
+          <img class="lobby-hero-logo" src="assets/favicon.svg?v=4" width="72" height="72" alt="" />
+          <h1>Lazy Lagoon</h1>
+          <p>Lounge around in the lagoon. Pick a game.</p>
+        </div>
+        <div class="game-grid">
+          <button type="button" class="game-card" data-route="/snake">
+            <h2>Snake</h2>
+            <p>Slither, snack, speed up. Arrows, WASD, or on-screen pad.</p>
+            <span class="stat" data-stat="snake">Best: 0</span>
+          </button>
+          <button type="button" class="game-card" data-route="/minesweeper">
+            <h2>Minesweeper</h2>
+            <p>Clear the field. Right-click or long-press to flag.</p>
+            <span class="stat" data-stat="minesweeper">E:- | M:- | H:-</span>
+          </button>
+          <button type="button" class="game-card" data-route="/tictactoe">
+            <h2>Tic-Tac-Toe</h2>
+            <p>PvP or try your luck with the hard AI</p>
+            <span class="stat">PvP | PvAI</span>
+          </button>
+          <button type="button" class="game-card" data-route="/sudoku">
+            <h2>Sudoku</h2>
+            <p>You know the game. No need for a book. Play right here.</p>
+            <span class="stat" data-stat="sudoku">E:- | M:- | H:-</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- SNAKE -->
+      <section id="view-snake" class="view" aria-label="Snake" aria-hidden="true">
+        <div class="game-layout">
+          <div class="game-toolbar">
+            <h2>Snake</h2>
+            <span class="stat-pill">Score: <strong id="snake-score">0</strong></span>
+            <span class="stat-pill">Best: <strong id="snake-best">0</strong></span>
+            <button type="button" class="btn btn-sm" id="snake-pause">Pause</button>
+            <button type="button" class="btn btn-sm" id="snake-restart">Restart</button>
+          </div>
+          <div class="game-stage">
+            <div class="snake-wrap">
+              <canvas id="snake-canvas" width="400" height="400" aria-label="Snake game canvas"></canvas>
+              <div class="dpad" aria-label="Direction pad">
+                <button type="button" class="btn up" data-dir="0,-1" aria-label="Up">^</button>
+                <button type="button" class="btn left" data-dir="-1,0" aria-label="Left">&lt;</button>
+                <button type="button" class="btn down" data-dir="0,1" aria-label="Down">v</button>
+                <button type="button" class="btn right" data-dir="1,0" aria-label="Right">&gt;</button>
+              </div>
+              <p class="hint">Arrows / WASD to start | Space pause | Eat neon cubes</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MINESWEEPER -->
+      <section id="view-minesweeper" class="view" aria-label="Minesweeper" aria-hidden="true">
+        <div class="game-layout">
+          <div class="game-toolbar">
+            <h2>Minesweeper</h2>
+            <span class="stat-pill">Mines: <strong id="ms-mines">10</strong></span>
+            <span class="stat-pill">Time: <strong id="ms-time">0:00</strong></span>
+            <span class="stat-pill">Best: <strong id="ms-best">-</strong></span>
+            <button type="button" class="btn btn-sm" id="ms-new">New</button>
+          </div>
+          <div class="game-stage">
+            <div class="side-panel">
+              <div class="diff-group" role="group" aria-label="Difficulty">
+                <button type="button" class="btn btn-sm active" data-ms-diff="easy">Easy</button>
+                <button type="button" class="btn btn-sm" data-ms-diff="medium">Medium</button>
+                <button type="button" class="btn btn-sm" data-ms-diff="hard">Hard</button>
+              </div>
+              <p class="hint">Left-click reveal | Right-click / long-press flag</p>
+            </div>
+            <div id="ms-board" class="ms-board easy"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TIC-TAC-TOE -->
+      <section id="view-tictactoe" class="view" aria-label="Tic-Tac-Toe" aria-hidden="true">
+        <div class="game-layout">
+          <div class="game-toolbar">
+            <h2>Tic-Tac-Toe</h2>
+            <span class="stat-pill" id="ttt-status">X's turn</span>
+            <button type="button" class="btn btn-sm" id="ttt-rematch">Rematch</button>
+          </div>
+          <div class="game-stage">
+            <div class="side-panel">
+              <div class="mode-toggle diff-group" role="group" aria-label="Game mode">
+                <button type="button" class="btn btn-sm" data-ttt-mode="pvp">PvP</button>
+                <button type="button" class="btn btn-sm active" data-ttt-mode="pvai">PvAI</button>
+              </div>
+              <p class="hint">Magic square win: three numbers summing to 15.</p>
+            </div>
+            <div id="ttt-board" class="ttt-board" role="grid" aria-label="Tic-Tac-Toe board"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SUDOKU -->
+      <section id="view-sudoku" class="view" aria-label="Sudoku" aria-hidden="true">
+        <div class="game-layout">
+          <div class="game-toolbar">
+            <h2>Sudoku</h2>
+            <span class="stat-pill">Time: <strong id="sudoku-time">0:00</strong></span>
+            <span class="stat-pill">Best: <strong id="sudoku-best">-</strong></span>
+            <button type="button" class="btn btn-sm" id="sudoku-new">New puzzle</button>
+            <button type="button" class="btn btn-sm" id="sudoku-check">Check</button>
+          </div>
+          <div class="game-stage">
+            <div class="side-panel">
+              <div class="diff-group" role="group" aria-label="Difficulty">
+                <button type="button" class="btn btn-sm active" data-sudoku-diff="easy">Easy</button>
+                <button type="button" class="btn btn-sm" data-sudoku-diff="medium">Medium</button>
+                <button type="button" class="btn btn-sm" data-sudoku-diff="hard">Hard</button>
+              </div>
+              <div class="numpad" aria-label="Number pad">
+                <button type="button" class="btn" data-sudoku-num="1">1</button>
+                <button type="button" class="btn" data-sudoku-num="2">2</button>
+                <button type="button" class="btn" data-sudoku-num="3">3</button>
+                <button type="button" class="btn" data-sudoku-num="4">4</button>
+                <button type="button" class="btn" data-sudoku-num="5">5</button>
+                <button type="button" class="btn" data-sudoku-num="6">6</button>
+                <button type="button" class="btn" data-sudoku-num="7">7</button>
+                <button type="button" class="btn" data-sudoku-num="8">8</button>
+                <button type="button" class="btn" data-sudoku-num="9">9</button>
+                <button type="button" class="btn btn-ghost" id="sudoku-clear">Clear</button>
+              </div>
+              <p class="hint" id="sudoku-check-msg">Tap a cell, then a number. Keys 1-9 / Delete.</p>
+            </div>
+            <div id="sudoku-board" class="sudoku-board" role="grid" aria-label="Sudoku board"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Global loading overlay -->
+  <div id="loader-overlay" class="overlay" aria-hidden="true" role="status" aria-live="polite">
+    <div class="overlay-card">
+      <h3 id="loader-title">Loading...</h3>
+      <div class="progress-track"><div id="loader-bar" class="progress-bar"></div></div>
+      <div id="loader-stage" class="stage-label"></div>
+    </div>
+  </div>
+
+  <!-- Snake overlay -->
+  <div id="snake-overlay" class="overlay" aria-hidden="true">
+    <div class="overlay-card">
+      <h3>Game Over</h3>
+      <p></p>
+      <div class="score-submit" data-score-form hidden>
+        <label class="score-label">Name (optional)
+          <input type="text" class="score-name" maxlength="16" autocomplete="nickname" placeholder="Your name" />
+        </label>
+        <button type="button" class="btn" data-submit-score>Submit score</button>
+        <p class="score-submit-msg hint" hidden></p>
+      </div>
+      <div class="overlay-actions">
+        <button type="button" class="btn" id="snake-resume" style="display:none">Resume</button>
+        <button type="button" class="btn" id="snake-again">Play again</button>
+        <button type="button" class="btn btn-ghost" id="snake-exit">Exit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Minesweeper overlay -->
+  <div id="ms-overlay" class="overlay" aria-hidden="true">
+    <div class="overlay-card">
+      <h3>Result</h3>
+      <p></p>
+      <div class="score-submit" data-score-form hidden>
+        <label class="score-label">Name (optional)
+          <input type="text" class="score-name" maxlength="16" autocomplete="nickname" placeholder="Your name" />
+        </label>
+        <button type="button" class="btn" data-submit-score>Submit score</button>
+        <p class="score-submit-msg hint" hidden></p>
+      </div>
+      <div class="overlay-actions">
+        <button type="button" class="btn" id="ms-again">New game</button>
+        <button type="button" class="btn btn-ghost" id="ms-exit">Exit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sudoku overlay -->
+  <div id="sudoku-overlay" class="overlay" aria-hidden="true">
+    <div class="overlay-card">
+      <h3>Solved!</h3>
+      <p></p>
+      <div class="score-submit" data-score-form hidden>
+        <label class="score-label">Name (optional)
+          <input type="text" class="score-name" maxlength="16" autocomplete="nickname" placeholder="Your name" />
+        </label>
+        <button type="button" class="btn" data-submit-score>Submit score</button>
+        <p class="score-submit-msg hint" hidden></p>
+      </div>
+      <div class="overlay-actions">
+        <button type="button" class="btn" id="sudoku-again">New puzzle</button>
+        <button type="button" class="btn btn-ghost" id="sudoku-exit">Exit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tic-Tac-Toe overlay -->
+  <div id="ttt-overlay" class="overlay" aria-hidden="true">
+    <div class="overlay-card">
+      <h3>Game Over</h3>
+      <p></p>
+      <div class="score-submit" data-score-form hidden>
+        <label class="score-label">Name (optional)
+          <input type="text" class="score-name" maxlength="16" autocomplete="nickname" placeholder="Your name" />
+        </label>
+        <button type="button" class="btn" data-submit-score>Submit score</button>
+        <p class="score-submit-msg hint" hidden></p>
+      </div>
+      <div class="overlay-actions">
+        <button type="button" class="btn" id="ttt-again">Rematch</button>
+        <button type="button" class="btn btn-ghost" id="ttt-exit">Exit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Leaderboard modal -->
+  <div id="lb-overlay" class="overlay" aria-hidden="true">
+    <div class="overlay-card overlay-card-wide">
+      <h3>Leaderboard</h3>
+      <div id="lb-modal-body" class="lb-body"></div>
+      <div class="overlay-actions">
+        <button type="button" class="btn btn-ghost" id="lb-refresh">Refresh</button>
+        <button type="button" class="btn" id="lb-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/leaderboard.js"></script>
+  <script src="js/loader.js"></script>
+  <script src="js/snake.js"></script>
+  <script src="js/minesweeper.js"></script>
+  <script src="js/tictactoe.js"></script>
+  <script src="js/sudoku.js"></script>
+  <script src="js/lake-bg.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
