@@ -5,7 +5,7 @@
   const LEGACY_KEY = 'leaderboard';
   const MAX_NAME = 16;
   const MAX_ENTRIES = 10;
-  const GAMES = ['snake', 'minesweeper', 'tictactoe', 'sudoku'];
+  const GAMES = ['snake', 'minesweeper', 'tictactoe', 'sudoku', 'memory', 'twenty48', 'breakout'];
   const DIFFS = ['easy', 'medium', 'hard'];
 
   let boardCache = null;
@@ -18,6 +18,9 @@
       minesweeper: { easy: [], medium: [], hard: [] },
       sudoku: { easy: [], medium: [], hard: [] },
       tictactoe: [],
+      memory: [],
+      twenty48: [],
+      breakout: [],
     };
   }
 
@@ -31,11 +34,11 @@
   }
 
   function lowerBetter(game) {
-    return game === 'minesweeper' || game === 'sudoku';
+    return game === 'minesweeper' || game === 'sudoku' || game === 'memory';
   }
 
   function needsDifficulty(game) {
-    return game === 'minesweeper' || game === 'sudoku';
+    return game === 'minesweeper' || game === 'sudoku' || game === 'memory';
   }
 
   function normalizeEntry(raw, game) {
@@ -96,6 +99,14 @@
         data.tictactoe.map((e) => normalizeEntry(e, 'tictactoe')).filter(Boolean)
       );
     }
+
+    ['memory', 'twenty48', 'breakout'].forEach((game) => {
+      if (!Array.isArray(data[game])) return;
+      board[game] = sortList(
+        game,
+        data[game].map((e) => normalizeEntry(e, game)).filter(Boolean)
+      );
+    });
 
     return board;
   }
@@ -187,6 +198,9 @@
     if (!entry) return '-';
     if (game === 'minesweeper' || game === 'sudoku') {
       return LazyStorage.formatTime(entry.score);
+    }
+    if (game === 'memory') {
+      return String(entry.score) + ' moves';
     }
     if (game === 'tictactoe') {
       const mode = entry.mode ? ' · ' + entry.mode.toUpperCase() : '';
@@ -341,6 +355,9 @@
         minesweeper: 'Minesweeper',
         tictactoe: 'Tic-Tac-Toe',
         sudoku: 'Sudoku',
+        memory: 'Memory',
+        twenty48: '2048',
+        breakout: 'Breakout',
       }[id] || id
     );
   }
@@ -363,7 +380,7 @@
       '<th scope="col">#</th>' +
       '<th scope="col">Name</th>' +
       '<th scope="col">' +
-      (lowerBetter(game) ? 'Time' : game === 'tictactoe' ? 'Result' : 'Score') +
+      (game === 'memory' ? 'Moves' : lowerBetter(game) ? 'Time' : game === 'tictactoe' ? 'Result' : 'Score') +
       '</th>' +
       '<th scope="col">Date</th>' +
       '</tr></thead>';

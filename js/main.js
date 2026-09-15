@@ -7,6 +7,9 @@
     '/minesweeper': 'minesweeper',
     '/tictactoe': 'tictactoe',
     '/sudoku': 'sudoku',
+    '/memory': 'memory',
+    '/2048': '2048',
+    '/breakout': 'breakout',
   };
 
   let current = null;
@@ -38,6 +41,9 @@
     else if (current === 'minesweeper') MinesweeperGame.unmount();
     else if (current === 'tictactoe') TicTacToeGame.unmount();
     else if (current === 'sudoku') SudokuGame.unmount();
+    else if (current === 'memory') MemoryGame.unmount();
+    else if (current === '2048') Twenty48Game.unmount();
+    else if (current === 'breakout') BreakoutGame.unmount();
   }
 
   async function mount(name) {
@@ -45,6 +51,9 @@
     else if (name === 'minesweeper') MinesweeperGame.mount();
     else if (name === 'tictactoe') TicTacToeGame.mount();
     else if (name === 'sudoku') await SudokuGame.mount();
+    else if (name === 'memory') MemoryGame.mount();
+    else if (name === '2048') Twenty48Game.mount();
+    else if (name === 'breakout') BreakoutGame.mount();
     else refreshAllStats();
   }
 
@@ -65,6 +74,9 @@
     SnakeGame.refreshLobbyStats();
     MinesweeperGame.refreshLobbyStats();
     SudokuGame.refreshLobbyStats();
+    MemoryGame.refreshLobbyStats();
+    Twenty48Game.refreshLobbyStats();
+    BreakoutGame.refreshLobbyStats();
   }
 
   function bindLobby() {

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#041018" />
-  <meta name="description" content="Lazy Lagoon - neon arcade: Snake, Minesweeper, Tic-Tac-Toe, Sudoku" />
+  <meta name="description" content="Lazy Lagoon - neon arcade: Snake, Minesweeper, Tic-Tac-Toe, Sudoku, Memory, 2048, Breakout" />
   <title>Lazy Lagoon</title>
   <link rel="icon" href="assets/favicon.svg?v=4" type="image/svg+xml" />
   <link rel="stylesheet" href="css/styles.css" />
@@ -53,6 +53,21 @@
             <h2>Sudoku</h2>
             <p>You know the game. No need for a book. Play right here.</p>
             <span class="stat" data-stat="sudoku">E:- | M:- | H:-</span>
+          </button>
+          <button type="button" class="game-card" data-route="/memory">
+            <h2>Memory Match</h2>
+            <p>Flip lagoon pairs. Fewer moves wins.</p>
+            <span class="stat" data-stat="memory">Best: -</span>
+          </button>
+          <button type="button" class="game-card" data-route="/2048">
+            <h2>2048</h2>
+            <p>Slide tiles, merge neon powers of two.</p>
+            <span class="stat" data-stat="twenty48">Best: 0</span>
+          </button>
+          <button type="button" class="game-card" data-route="/breakout">
+            <h2>Breakout</h2>
+            <p>Bounce the ball. Clear the bricks. Three lives.</p>
+            <span class="stat" data-stat="breakout">Best: 0</span>
           </button>
         </div>
       </section>
@@ -162,6 +177,66 @@
           </div>
         </div>
       </section>
+
+      <!-- MEMORY -->
+      <section id="view-memory" class="view" aria-label="Memory Match" aria-hidden="true">
+        <div class="game-layout">
+          <div class="game-toolbar">
+            <h2>Memory Match</h2>
+            <span class="stat-pill">Moves: <strong id="memory-moves">0</strong></span>
+            <span class="stat-pill">Time: <strong id="memory-time">0:00</strong></span>
+            <span class="stat-pill">Best: <strong id="memory-best">-</strong></span>
+            <button type="button" class="btn btn-sm" id="memory-restart">Restart</button>
+          </div>
+          <div class="game-stage">
+            <div id="memory-board" class="memory-board" role="grid" aria-label="Memory board"></div>
+            <p class="hint">Flip two cards. Match all pairs with as few moves as you can.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2048 -->
+      <section id="view-2048" class="view" aria-label="2048" aria-hidden="true">
+        <div class="game-layout">
+          <div class="game-toolbar">
+            <h2>2048</h2>
+            <span class="stat-pill">Score: <strong id="t48-score">0</strong></span>
+            <span class="stat-pill">Best: <strong id="t48-best">0</strong></span>
+            <button type="button" class="btn btn-sm" id="t48-new">New game</button>
+          </div>
+          <div class="game-stage">
+            <div id="t48-board" class="t48-board" role="grid" aria-label="2048 board"></div>
+            <div class="dpad" aria-label="Direction pad">
+              <button type="button" class="btn up" data-t48-dir="up" aria-label="Up">^</button>
+              <button type="button" class="btn left" data-t48-dir="left" aria-label="Left">&lt;</button>
+              <button type="button" class="btn down" data-t48-dir="down" aria-label="Down">v</button>
+              <button type="button" class="btn right" data-t48-dir="right" aria-label="Right">&gt;</button>
+            </div>
+            <p class="hint">Arrows / WASD / swipe / pad. Merge to 2048+.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- BREAKOUT -->
+      <section id="view-breakout" class="view" aria-label="Breakout" aria-hidden="true">
+        <div class="game-layout">
+          <div class="game-toolbar">
+            <h2>Breakout</h2>
+            <span class="stat-pill">Score: <strong id="breakout-score">0</strong></span>
+            <span class="stat-pill">Lives: <strong id="breakout-lives">3</strong></span>
+            <span class="stat-pill">Best: <strong id="breakout-best">0</strong></span>
+            <button type="button" class="btn btn-sm" id="breakout-pause">Pause</button>
+            <button type="button" class="btn btn-sm" id="breakout-restart">Restart</button>
+          </div>
+          <div class="game-stage">
+            <div class="breakout-wrap">
+              <canvas id="breakout-canvas" width="480" height="360" aria-label="Breakout game canvas"></canvas>
+              <p class="hint">Mouse / touch / arrows move paddle. Space launches or pauses.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
@@ -251,6 +326,66 @@
     </div>
   </div>
 
+
+  <!-- Memory overlay -->
+  <div id="memory-overlay" class="overlay" aria-hidden="true">
+    <div class="overlay-card">
+      <h3>All matched!</h3>
+      <p></p>
+      <div class="score-submit" data-score-form hidden>
+        <label class="score-label">Name (optional)
+          <input type="text" class="score-name" maxlength="16" autocomplete="nickname" placeholder="Your name" />
+        </label>
+        <button type="button" class="btn" data-submit-score>Submit score</button>
+        <p class="score-submit-msg hint" hidden></p>
+      </div>
+      <div class="overlay-actions">
+        <button type="button" class="btn" id="memory-again">Play again</button>
+        <button type="button" class="btn btn-ghost" id="memory-exit">Exit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2048 overlay -->
+  <div id="t48-overlay" class="overlay" aria-hidden="true">
+    <div class="overlay-card">
+      <h3>Game Over</h3>
+      <p></p>
+      <div class="score-submit" data-score-form hidden>
+        <label class="score-label">Name (optional)
+          <input type="text" class="score-name" maxlength="16" autocomplete="nickname" placeholder="Your name" />
+        </label>
+        <button type="button" class="btn" data-submit-score>Submit score</button>
+        <p class="score-submit-msg hint" hidden></p>
+      </div>
+      <div class="overlay-actions">
+        <button type="button" class="btn" id="t48-continue" style="display:none">Keep going</button>
+        <button type="button" class="btn" id="t48-again">New game</button>
+        <button type="button" class="btn btn-ghost" id="t48-exit">Exit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Breakout overlay -->
+  <div id="breakout-overlay" class="overlay" aria-hidden="true">
+    <div class="overlay-card">
+      <h3>Game Over</h3>
+      <p></p>
+      <div class="score-submit" data-score-form hidden>
+        <label class="score-label">Name (optional)
+          <input type="text" class="score-name" maxlength="16" autocomplete="nickname" placeholder="Your name" />
+        </label>
+        <button type="button" class="btn" data-submit-score>Submit score</button>
+        <p class="score-submit-msg hint" hidden></p>
+      </div>
+      <div class="overlay-actions">
+        <button type="button" class="btn" id="breakout-resume" style="display:none">Resume</button>
+        <button type="button" class="btn" id="breakout-again">Play again</button>
+        <button type="button" class="btn btn-ghost" id="breakout-exit">Exit</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Leaderboard modal -->
   <div id="lb-overlay" class="overlay" aria-hidden="true">
     <div class="overlay-card overlay-card-wide">
@@ -270,6 +405,9 @@
   <script src="js/minesweeper.js"></script>
   <script src="js/tictactoe.js"></script>
   <script src="js/sudoku.js"></script>
+  <script src="js/memory.js"></script>
+  <script src="js/twenty48.js"></script>
+  <script src="js/breakout.js"></script>
   <script src="js/lake-bg.js"></script>
   <script src="js/main.js"></script>
 </body>

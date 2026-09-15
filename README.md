@@ -1,31 +1,32 @@
 # Lazy Lagoon
 
-A tiny browser arcade with a pixel lake vibe. Lounge around and play **Snake**, **Minesweeper**, **Tic-Tac-Toe**, or **Sudoku** — no install, no account.
+A tiny browser arcade with a pixel lake vibe. Lounge around and play **Snake**, **Minesweeper**, **Tic-Tac-Toe**, **Sudoku**, **Memory Match**, **2048**, or **Breakout**
 
 Open it, pick a game, chase a high score.
 
 ## Play
 
-Serve the folder (recommended) or open `index.html` in your browser:
+Serve the folder (recommended) or open index.html in your browser:
 
-```bash
+`bash
 npx --yes serve .
 # or: python -m http.server 8080
-```
+`
 
-Then open the URL it prints (for example `http://localhost:3000`).
-
-Double-clicking `index.html` also works.
+Then open the URL it prints (for example http://localhost:3000).
 
 ### Routes
 
 | Path | Game |
 |------|------|
-| `#/` | Lobby |
-| `#/snake` | Snake |
-| `#/minesweeper` | Minesweeper |
-| `#/tictactoe` | Tic-Tac-Toe |
-| `#/sudoku` | Sudoku |
+| #/ | Lobby |
+| #/snake | Snake |
+| #/minesweeper | Minesweeper |
+| #/tictactoe | Tic-Tac-Toe |
+| #/sudoku | Sudoku |
+| #/memory | Memory Match |
+| #/2048 | 2048 |
+| #/breakout | Breakout |
 
 ### Controls
 
@@ -34,36 +35,40 @@ Double-clicking `index.html` also works.
 | **Snake** | Arrows or WASD (also starts the run), or the on-screen pad. Space pauses. |
 | **Minesweeper** | Click to reveal. Right-click or long-press to flag. |
 | **Tic-Tac-Toe** | Click a cell. Play vs a friend or vs the AI. |
-| **Sudoku** | Click a cell, then use the number pad or keys `1`–`9`. Delete clears. |
+| **Sudoku** | Click a cell, then use the number pad or keys 1–9. Delete clears. |
+| **Memory Match** | Click cards to flip. Match all pairs; fewer moves is better. |
+| **2048** | Arrows, WASD, swipe, or on-screen pad. Merge tiles to raise your score. |
+| **Breakout** | Mouse, touch, or arrows move the paddle. Space / click launches or pauses. |
 
-Personal bests for the in-game HUD stay in this browser (`localStorage`).
+Personal bests for the in-game HUD stay in this browser.
 
 ## Leaderboard
 
-The lobby **Leaderboard** shows a **top 10** list per game (Snake, Minesweeper, Tic-Tac-Toe, Sudoku). Minesweeper and Sudoku also split Easy / Medium / Hard.
+The lobby **Leaderboard** shows a **top 10** list per game (Snake, Minesweeper, Tic-Tac-Toe, Sudoku, Memory, 2048, Breakout). Minesweeper and Sudoku also split Easy / Medium / Hard.
 
-When you finish a run, you can optionally enter a name. Only scores that earn a top-10 spot are saved. Scores stay **on this device** (browser storage) — there is no shared/global board.
+When you finish a run, you can optionally enter a name. Only scores that earn a top-10 spot are saved. Scores stay **on this device** (browser storage) — there is currently no shared/global board for the demo.
 
-- **Snake** — higher score wins
+- **Snake / 2048 / Breakout** — higher score wins
 - **Minesweeper / Sudoku** — faster time (seconds) wins
+- **Memory Match** — fewer moves wins
 - **Tic-Tac-Toe** — recent wins (up to 10)
 
 ## Project layout
 
-```
+`
 lazy-lagoon/
   index.html
   css/styles.css
   js/           # games, lobby, leaderboard, lake background
   assets/favicon.svg
-```
+`
 
 Plain HTML, CSS, and JS. No build step.
 
 ## Accessibility
 
-Animations ease off when `prefers-reduced-motion` is set.
+Animations ease off when prefers-reduced-motion is set.
 
 ## License
 
-MIT � see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
