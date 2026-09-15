@@ -2,7 +2,11 @@
 (function (global) {
   const BEST_KEY = 'memory.bestMoves';
   const PAIR_COUNT = 8;
-  const SYMBOLS = ['🐠', '🐙', '🦀', '🐚', '🌊', '🐟', '🐡', '🦈'];
+  const EMOJI_POOL = [
+    '🐠', '🐙', '🦀', '🐚', '🌊', '🐟', '🐡', '🦈',
+    '🪸', '🐋', '🐬', '🦭', '🦑', '🦐', '🦞', '🌴',
+    '🌅', '⭐', '🌙', '💎', '🔮', '🧿', '🛶', '⛵',
+  ];
   const FLIP_DELAY = 650;
 
   let cards = [];
@@ -26,6 +30,10 @@
       a[j] = t;
     }
     return a;
+  }
+
+  function pickSymbols() {
+    return shuffle(EMOJI_POOL).slice(0, PAIR_COUNT);
   }
 
   function updateHud() {
@@ -52,7 +60,10 @@
   }
 
   function hideOverlay() {
-    document.getElementById('memory-overlay')?.classList.remove('visible');
+    const ov = document.getElementById('memory-overlay');
+    if (!ov) return;
+    ov.classList.remove('visible');
+    ov.setAttribute('aria-hidden', 'true');
   }
 
   function showOverlay(title, msg, canSubmit) {
@@ -72,6 +83,7 @@
       });
     }
     ov.classList.add('visible');
+    ov.setAttribute('aria-hidden', 'false');
   }
 
   function render() {
@@ -85,18 +97,20 @@
       if (card.flipped || card.matched) btn.classList.add('flipped');
       if (card.matched) btn.classList.add('matched');
       btn.disabled = won || card.matched || locked;
-      btn.setAttribute('aria-label', card.flipped || card.matched ? 'Card ' + card.symbol : 'Face-down card');
-      const inner = document.createElement('span');
-      inner.className = 'memory-card-inner';
+      btn.setAttribute(
+        'aria-label',
+        card.flipped || card.matched ? 'Card ' + card.symbol : 'Face-down card'
+      );
       const front = document.createElement('span');
       front.className = 'memory-face memory-front';
+      front.setAttribute('aria-hidden', 'true');
       front.textContent = '?';
       const back = document.createElement('span');
       back.className = 'memory-face memory-back';
+      back.setAttribute('aria-hidden', 'true');
       back.textContent = card.symbol;
-      inner.appendChild(front);
-      inner.appendChild(back);
-      btn.appendChild(inner);
+      btn.appendChild(front);
+      btn.appendChild(back);
       btn.addEventListener('click', () => flip(i));
       board.appendChild(btn);
     });
@@ -156,7 +170,7 @@
 
   function reset() {
     stopTimer();
-    const pool = SYMBOLS.slice(0, PAIR_COUNT);
+    const pool = pickSymbols();
     const deck = shuffle(pool.concat(pool));
     cards = deck.map((symbol) => ({ symbol, flipped: false, matched: false }));
     flipped = [];
@@ -200,6 +214,7 @@
 
   function unmount() {
     stopTimer();
+    hideOverlay();
   }
 
   global.MemoryGame = { mount, unmount, refreshLobbyStats, BEST_KEY };

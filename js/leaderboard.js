@@ -34,7 +34,7 @@
   }
 
   function lowerBetter(game) {
-    return game === 'minesweeper' || game === 'sudoku' || game === 'memory';
+    return game === 'minesweeper' || game === 'sudoku' || game === 'memory' || game === 'breakout';
   }
 
   function needsDifficulty(game) {
@@ -196,7 +196,7 @@
 
   function formatScore(game, entry) {
     if (!entry) return '-';
-    if (game === 'minesweeper' || game === 'sudoku') {
+    if (game === 'minesweeper' || game === 'sudoku' || game === 'breakout') {
       return LazyStorage.formatTime(entry.score);
     }
     if (game === 'memory') {

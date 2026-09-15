@@ -251,10 +251,14 @@
       });
     }
     ov.classList.add('visible');
+    ov.setAttribute('aria-hidden', 'false');
   }
 
   function hideOverlay() {
-    document.getElementById('ms-overlay')?.classList.remove('visible');
+    const ov = document.getElementById('ms-overlay');
+    if (!ov) return;
+    ov.classList.remove('visible');
+    ov.setAttribute('aria-hidden', 'true');
   }
 
   function setDifficulty(diff) {

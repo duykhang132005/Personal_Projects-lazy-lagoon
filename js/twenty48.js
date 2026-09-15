@@ -37,7 +37,10 @@
   }
 
   function hideOverlay() {
-    document.getElementById('t48-overlay')?.classList.remove('visible');
+    const ov = document.getElementById('t48-overlay');
+    if (!ov) return;
+    ov.classList.remove('visible');
+    ov.setAttribute('aria-hidden', 'true');
   }
 
   function showOverlay(title, msg, canSubmit, opts) {
@@ -61,6 +64,7 @@
       });
     }
     ov.classList.add('visible');
+    ov.setAttribute('aria-hidden', 'false');
   }
 
   function tileClass(v) {

@@ -61,7 +61,6 @@ a:hover { text-shadow: var(--neon-glow); }
 
 .app-shell {
   position: relative;
-  z-index: 1;
   max-width: 1100px;
   margin: 0 auto;
   padding: 1rem 1.25rem 2rem;
@@ -69,6 +68,8 @@ a:hover { text-shadow: var(--neon-glow); }
 
 /* Header */
 .site-header {
+  position: relative;
+  z-index: 1100;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -356,6 +357,10 @@ a:hover { text-shadow: var(--neon-glow); }
 .overlay.visible {
   opacity: 1;
   pointer-events: auto;
+}
+
+.overlay[aria-hidden="true"] {
+  pointer-events: none !important;
 }
 
 .overlay-card {
@@ -729,8 +734,11 @@ a:hover { text-shadow: var(--neon-glow); }
 .lb-note { margin-top: 0.75rem; }
 
 
+
 /* ===== Memory Match ===== */
 .memory-board {
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
@@ -739,30 +747,25 @@ a:hover { text-shadow: var(--neon-glow); }
 }
 
 .memory-card {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
   appearance: none;
   border: 2px solid var(--neon-dim);
   border-radius: 12px;
-  background: transparent;
+  background: var(--panel-solid);
   padding: 0;
   cursor: pointer;
-  perspective: 800px;
   aspect-ratio: 1;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.45);
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s;
 }
 
 .memory-card:disabled { cursor: default; }
-.memory-card:hover:not(:disabled) { border-color: var(--neon); box-shadow: var(--neon-glow); }
-
-.memory-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transform-style: preserve-3d;
-  transition: transform 0.35s ease;
-}
-
-.memory-card.flipped .memory-card-inner,
-.memory-card.matched .memory-card-inner {
-  transform: rotateY(180deg);
+.memory-card:hover:not(:disabled) {
+  border-color: var(--neon);
+  box-shadow: var(--neon-glow), 0 4px 14px rgba(0, 0, 0, 0.45);
 }
 
 .memory-face {
@@ -771,35 +774,54 @@ a:hover { text-shadow: var(--neon-glow); }
   display: flex;
   align-items: center;
   justify-content: center;
-  backface-visibility: hidden;
+  pointer-events: none;
   border-radius: 10px;
-  font-size: clamp(1.4rem, 6vw, 2rem);
+  font-size: clamp(1.6rem, 7vw, 2.25rem);
+  line-height: 1;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .memory-front {
-  background: rgba(0, 0, 0, 0.45);
+  background: linear-gradient(160deg, #0d2f38 0%, #071820 100%);
   color: var(--neon);
   text-shadow: var(--neon-glow);
   font-family: var(--mono);
   font-weight: 700;
+  font-size: clamp(1.5rem, 6vw, 2rem);
+  opacity: 1;
+  transform: scale(1);
 }
 
 .memory-back {
-  background: rgba(57, 255, 20, 0.12);
-  transform: rotateY(180deg);
+  background: linear-gradient(160deg, #123a32 0%, #0a2420 100%);
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.86);
+}
+
+.memory-card.flipped .memory-front,
+.memory-card.matched .memory-front {
+  opacity: 0;
+  transform: scale(0.86);
+}
+
+.memory-card.flipped .memory-back,
+.memory-card.matched .memory-back {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .memory-card.matched {
   border-color: var(--neon);
-  box-shadow: var(--neon-glow);
+  box-shadow: var(--neon-glow), 0 4px 14px rgba(0, 0, 0, 0.45);
 }
 
 .memory-card.matched .memory-back {
-  background: rgba(57, 255, 20, 0.22);
+  background: linear-gradient(160deg, #1a5c4a 0%, #0f332c 100%);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .memory-card-inner { transition: none; }
+  .memory-face { transition: none; }
 }
 
 /* ===== 2048 ===== */

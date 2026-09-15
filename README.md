@@ -48,8 +48,8 @@ The lobby **Leaderboard** shows a **top 10** list per game (Snake, Minesweeper, 
 
 When you finish a run, you can optionally enter a name. Only scores that earn a top-10 spot are saved. Scores stay **on this device** (browser storage) — there is currently no shared/global board for the demo.
 
-- **Snake / 2048 / Breakout** — higher score wins
-- **Minesweeper / Sudoku** — faster time (seconds) wins
+- **Snake / 2048** — higher score wins
+- **Minesweeper / Sudoku / Breakout** — faster time (seconds) wins
 - **Memory Match** — fewer moves wins
 - **Tic-Tac-Toe** — recent wins (up to 10)
 

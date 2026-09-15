@@ -297,10 +297,14 @@
       });
     }
     ov.classList.add('visible');
+    ov.setAttribute('aria-hidden', 'false');
   }
 
   function hideOverlay() {
-    document.getElementById('sudoku-overlay')?.classList.remove('visible');
+    const ov = document.getElementById('sudoku-overlay');
+    if (!ov) return;
+    ov.classList.remove('visible');
+    ov.setAttribute('aria-hidden', 'true');
   }
 
   function onKey(e) {

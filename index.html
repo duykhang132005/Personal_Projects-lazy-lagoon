@@ -56,18 +56,18 @@
           </button>
           <button type="button" class="game-card" data-route="/memory">
             <h2>Memory Match</h2>
-            <p>Flip lagoon pairs. Fewer moves wins.</p>
+            <p>Flip pairs for the right match! Fewer moves wins.</p>
             <span class="stat" data-stat="memory">Best: -</span>
           </button>
           <button type="button" class="game-card" data-route="/2048">
             <h2>2048</h2>
-            <p>Slide tiles, merge neon powers of two.</p>
+            <p>Slide tiles, merge numbers, max out the square.</p>
             <span class="stat" data-stat="twenty48">Best: 0</span>
           </button>
           <button type="button" class="game-card" data-route="/breakout">
             <h2>Breakout</h2>
             <p>Bounce the ball. Clear the bricks. Three lives.</p>
-            <span class="stat" data-stat="breakout">Best: 0</span>
+            <span class="stat" data-stat="breakout">Best: -</span>
           </button>
         </div>
       </section>
@@ -224,7 +224,8 @@
             <h2>Breakout</h2>
             <span class="stat-pill">Score: <strong id="breakout-score">0</strong></span>
             <span class="stat-pill">Lives: <strong id="breakout-lives">3</strong></span>
-            <span class="stat-pill">Best: <strong id="breakout-best">0</strong></span>
+            <span class="stat-pill">Time: <strong id="breakout-time">0:00</strong></span>
+            <span class="stat-pill">Best: <strong id="breakout-best">-</strong></span>
             <button type="button" class="btn btn-sm" id="breakout-pause">Pause</button>
             <button type="button" class="btn btn-sm" id="breakout-restart">Restart</button>
           </div>

@@ -1,6 +1,7 @@
 /* Lazy Lagoon - Breakout */
 (function (global) {
-  const BEST_KEY = 'breakout.best';
+  const BEST_KEY = 'breakout.bestTime';
+  const LEGACY_BEST_KEY = 'breakout.best';
   const W = 480;
   const H = 360;
   const PADDLE_W = 80;
@@ -17,7 +18,7 @@
   let bricks = [];
   let score = 0;
   let lives = LIVES0;
-  let best = 0;
+  let best = null;
   let running = false;
   let paused = false;
   let over = false;
@@ -26,6 +27,10 @@
   let bound = false;
   let keys = { left: false, right: false };
   let reducedMotion = false;
+  let startedAt = 0;
+  let pauseStartedAt = 0;
+  let elapsed = 0;
+  let timerId = null;
 
   const COLORS = ['#39ff14', '#7ec8ff', '#ff9f1c', '#ff5ec8'];
 
@@ -78,19 +83,52 @@
     vy = -Math.abs(Math.sin(angle) * speed);
   }
 
+  function stopTimer() {
+    clearInterval(timerId);
+    timerId = null;
+  }
+
+  function syncElapsed() {
+    if (!startedAt) {
+      elapsed = 0;
+      return elapsed;
+    }
+    let end = Date.now();
+    if (paused && pauseStartedAt) end = pauseStartedAt;
+    elapsed = Math.max(0, Math.floor((end - startedAt) / 1000));
+    return elapsed;
+  }
+
+  function startTimer() {
+    if (timerId || over) return;
+    if (!startedAt) startedAt = Date.now();
+    stopTimer();
+    timerId = setInterval(() => {
+      if (!paused && !over) {
+        syncElapsed();
+        updateHud();
+      }
+    }, 250);
+  }
+
   function updateHud() {
     const s = document.getElementById('breakout-score');
     const l = document.getElementById('breakout-lives');
+    const t = document.getElementById('breakout-time');
     const b = document.getElementById('breakout-best');
     if (s) s.textContent = String(score);
     if (l) l.textContent = String(lives);
-    if (b) b.textContent = String(best);
+    if (t) t.textContent = LazyStorage.formatTime(elapsed);
+    if (b) b.textContent = best == null ? '-' : LazyStorage.formatTime(best);
     const pauseBtn = document.getElementById('breakout-pause');
     if (pauseBtn) pauseBtn.textContent = paused ? 'Resume' : 'Pause';
   }
 
   function hideOverlay() {
-    document.getElementById('breakout-overlay')?.classList.remove('visible');
+    const ov = document.getElementById('breakout-overlay');
+    if (!ov) return;
+    ov.classList.remove('visible');
+    ov.setAttribute('aria-hidden', 'true');
   }
 
   function showOverlay(title, msg, canSubmit, isPause) {
@@ -109,13 +147,14 @@
         show: !!canSubmit && !isPause,
         getPayload: () => ({
           game: 'breakout',
-          score: score,
-          unit: 'pts',
-          metric: 'score',
+          score: elapsed,
+          unit: 's',
+          metric: 'time',
         }),
       });
     }
     ov.classList.add('visible');
+    ov.setAttribute('aria-hidden', 'false');
   }
 
   function remaining() {
@@ -126,20 +165,28 @@
     over = true;
     won = true;
     running = false;
-    best = LazyStorage.updateBestHigh(BEST_KEY, score);
+    stopTimer();
+    syncElapsed();
+    best = LazyStorage.updateBestLow(BEST_KEY, elapsed);
     updateHud();
     refreshLobbyStats();
-    showOverlay('Cleared!', 'Score: ' + score + (score >= best ? ' · New best!' : ''), true, false);
+    const msg =
+      'Time: ' +
+      LazyStorage.formatTime(elapsed) +
+      ' · Bricks: ' +
+      score +
+      (best === elapsed ? ' · New best!' : '');
+    showOverlay('Cleared!', msg, true, false);
   }
 
   function endLose() {
     over = true;
     won = false;
     running = false;
-    best = LazyStorage.updateBestHigh(BEST_KEY, score);
+    stopTimer();
+    syncElapsed();
     updateHud();
-    refreshLobbyStats();
-    showOverlay('Game Over', 'Score: ' + score + (score >= best ? ' · New best!' : ''), true, false);
+    showOverlay('Game Over', 'Score: ' + score + ' · Time: ' + LazyStorage.formatTime(elapsed), false, false);
   }
 
   function draw() {
@@ -147,7 +194,6 @@
     ctx.fillStyle = '#020c10';
     ctx.fillRect(0, 0, W, H);
 
-    // bricks
     bricks.forEach((b) => {
       if (!b.alive) return;
       ctx.fillStyle = b.color;
@@ -159,7 +205,6 @@
       ctx.shadowBlur = 0;
     });
 
-    // paddle
     ctx.fillStyle = '#b8ff9a';
     if (!reducedMotion) {
       ctx.shadowColor = '#39ff14';
@@ -168,7 +213,6 @@
     ctx.fillRect(paddleX, H - 28, PADDLE_W, PADDLE_H);
     ctx.shadowBlur = 0;
 
-    // ball
     ctx.beginPath();
     ctx.fillStyle = '#7ec8ff';
     if (!reducedMotion) {
@@ -205,7 +249,6 @@
     if (ballX > W - BALL_R) { ballX = W - BALL_R; vx = -Math.abs(vx); }
     if (ballY < BALL_R) { ballY = BALL_R; vy = Math.abs(vy); }
 
-    // paddle
     const py = H - 28;
     if (
       ballY + BALL_R >= py &&
@@ -222,7 +265,6 @@
       vy = -Math.abs(Math.cos(angle) * spd);
     }
 
-    // bricks
     for (let i = 0; i < bricks.length; i++) {
       const b = bricks[i];
       if (!b.alive) continue;
@@ -234,9 +276,7 @@
       ) {
         b.alive = false;
         score += 10;
-        best = LazyStorage.updateBestHigh(BEST_KEY, score);
         updateHud();
-        // bounce from nearest edge
         const overlapL = ballX + BALL_R - b.x;
         const overlapR = b.x + b.w - (ballX - BALL_R);
         const overlapT = ballY + BALL_R - b.y;
@@ -280,7 +320,9 @@
     if (!running) {
       running = true;
       paused = false;
+      pauseStartedAt = 0;
       hideOverlay();
+      startTimer();
     }
   }
 
@@ -288,24 +330,44 @@
     if (over || (!running && !paused)) return;
     paused = !paused;
     if (paused) {
+      pauseStartedAt = Date.now();
+      syncElapsed();
       showOverlay('Paused', 'Resume when ready.', false, true);
     } else {
+      if (pauseStartedAt && startedAt) {
+        startedAt += Date.now() - pauseStartedAt;
+      }
+      pauseStartedAt = 0;
       hideOverlay();
       running = true;
+      startTimer();
     }
     updateHud();
   }
 
+  function loadBest() {
+    const v = LazyStorage.get(BEST_KEY, null);
+    if (v != null && Number.isFinite(Number(v))) return Number(v);
+    try {
+      LazyStorage.set(LEGACY_BEST_KEY, null);
+    } catch { /* */ }
+    return null;
+  }
+
   function reset() {
     cancelAnimationFrame(raf);
+    stopTimer();
     score = 0;
     lives = LIVES0;
     over = false;
     won = false;
     running = false;
     paused = false;
+    startedAt = 0;
+    pauseStartedAt = 0;
+    elapsed = 0;
     paddleX = (W - PADDLE_W) / 2;
-    best = LazyStorage.getNumber(BEST_KEY, 0);
+    best = loadBest();
     buildBricks();
     resetBall();
     if (global.LazyLeaderboard) LazyLeaderboard.resetRound();
@@ -392,7 +454,9 @@
 
   function refreshLobbyStats() {
     const el = document.querySelector('[data-stat="breakout"]');
-    if (el) el.textContent = 'Best: ' + LazyStorage.getNumber(BEST_KEY, 0);
+    if (!el) return;
+    const v = LazyStorage.get(BEST_KEY, null);
+    el.textContent = v == null ? 'Best: -' : 'Best: ' + LazyStorage.formatTime(Number(v));
   }
 
   function mount() {
@@ -404,9 +468,11 @@
 
   function unmount() {
     cancelAnimationFrame(raf);
+    stopTimer();
     running = false;
     keys.left = false;
     keys.right = false;
+    hideOverlay();
   }
 
   global.BreakoutGame = { mount, unmount, refreshLobbyStats, BEST_KEY };

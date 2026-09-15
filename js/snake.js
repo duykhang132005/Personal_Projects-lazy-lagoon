@@ -210,11 +210,14 @@
       });
     }
     ov.classList.add('visible');
+    ov.setAttribute('aria-hidden', 'false');
   }
 
   function hideOverlay() {
     const ov = document.getElementById('snake-overlay');
-    if (ov) ov.classList.remove('visible');
+    if (!ov) return;
+    ov.classList.remove('visible');
+    ov.setAttribute('aria-hidden', 'true');
   }
 
   function onKey(e) {
@@ -281,6 +284,7 @@
   function unmount() {
     clearInterval(timer);
     running = false;
+    hideOverlay();
   }
 
   global.SnakeGame = { mount, unmount, refreshLobbyStats, BEST_KEY };

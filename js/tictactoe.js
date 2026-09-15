@@ -113,10 +113,14 @@
       });
     }
     ov.classList.add('visible');
+    ov.setAttribute('aria-hidden', 'false');
   }
 
   function hideOverlay() {
-    document.getElementById('ttt-overlay')?.classList.remove('visible');
+    const ov = document.getElementById('ttt-overlay');
+    if (!ov) return;
+    ov.classList.remove('visible');
+    ov.setAttribute('aria-hidden', 'true');
   }
 
   function render() {
