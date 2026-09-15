@@ -740,10 +740,26 @@ a:hover { text-shadow: var(--neon-glow); }
   position: relative;
   z-index: 2;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   width: min(360px, 92vw);
+}
+
+.memory-board.easy {
+  grid-template-columns: repeat(4, 1fr);
+  aspect-ratio: 4 / 3;
+  width: min(360px, 92vw);
+}
+
+.memory-board.medium {
+  grid-template-columns: repeat(4, 1fr);
   aspect-ratio: 1;
+  width: min(360px, 92vw);
+}
+
+.memory-board.hard {
+  grid-template-columns: repeat(6, 1fr);
+  aspect-ratio: 6 / 4;
+  width: min(540px, 96vw);
 }
 
 .memory-card {

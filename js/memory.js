@@ -1,14 +1,21 @@
 /* Lazy Lagoon - Memory Match */
 (function (global) {
-  const BEST_KEY = 'memory.bestMoves';
-  const PAIR_COUNT = 8;
+  const DIFFS = {
+    easy: { cols: 4, rows: 3, pairs: 6, label: 'Easy' },
+    medium: { cols: 4, rows: 4, pairs: 8, label: 'Medium' },
+    hard: { cols: 6, rows: 4, pairs: 12, label: 'Hard' },
+  };
+  const LEGACY_BEST_KEY = 'memory.bestMoves';
   const EMOJI_POOL = [
-    '🐠', '🐙', '🦀', '🐚', '🌊', '🐟', '🐡', '🦈',
-    '🪸', '🐋', '🐬', '🦭', '🦑', '🦐', '🦞', '🌴',
-    '🌅', '⭐', '🌙', '💎', '🔮', '🧿', '🛶', '⛵',
+    '🌲', '🌳', '🌴', '🌵', '🌿', '🍀', '🍁', '🍂',
+    '🍃', '🌺', '🌻', '🌸', '🌼', '🌷', '🍄', '🌾',
+    '🌱', '🪴', '🪨', '⛰️', '🦋', '🐝', '🐞', '🦉',
+    '🦊', '🦌', '🐿️', '🦔', '🌍', '🌙', '☀️', '🌈',
   ];
   const FLIP_DELAY = 650;
 
+  let difficulty = 'medium';
+  let pairCount = DIFFS.medium.pairs;
   let cards = [];
   let flipped = [];
   let matched = 0;
@@ -21,6 +28,24 @@
   let bound = false;
   let best = null;
 
+  function bestKey(diff) {
+    return 'memory.' + diff + '.bestMoves';
+  }
+
+  function migrateLegacyBest() {
+    const legacy = LazyStorage.get(LEGACY_BEST_KEY, null);
+    if (legacy == null) return;
+    const mediumKey = bestKey('medium');
+    if (LazyStorage.get(mediumKey, null) == null) {
+      LazyStorage.set(mediumKey, Number(legacy));
+    }
+    try {
+      LazyStorage.set(LEGACY_BEST_KEY, null);
+    } catch {
+      /* ignore */
+    }
+  }
+
   function shuffle(arr) {
     const a = arr.slice();
     for (let i = a.length - 1; i > 0; i--) {
@@ -32,8 +57,8 @@
     return a;
   }
 
-  function pickSymbols() {
-    return shuffle(EMOJI_POOL).slice(0, PAIR_COUNT);
+  function pickSymbols(count) {
+    return shuffle(EMOJI_POOL).slice(0, count);
   }
 
   function updateHud() {
@@ -43,6 +68,9 @@
     if (m) m.textContent = String(moves);
     if (t) t.textContent = LazyStorage.formatTime(elapsed);
     if (b) b.textContent = best == null ? '-' : String(best);
+    document.querySelectorAll('[data-memory-diff]').forEach((btn) => {
+      btn.classList.toggle('active', btn.getAttribute('data-memory-diff') === difficulty);
+    });
   }
 
   function stopTimer() {
@@ -79,6 +107,7 @@
           score: moves,
           unit: 'moves',
           metric: 'moves',
+          difficulty: difficulty,
         }),
       });
     }
@@ -89,6 +118,7 @@
   function render() {
     const board = document.getElementById('memory-board');
     if (!board) return;
+    board.className = 'memory-board ' + difficulty;
     board.innerHTML = '';
     cards.forEach((card, i) => {
       const btn = document.createElement('button');
@@ -137,7 +167,7 @@
       flipped = [];
       matched += 1;
       render();
-      if (matched >= PAIR_COUNT) win();
+      if (matched >= pairCount) win();
     } else {
       locked = true;
       const pending = flipped.slice();
@@ -156,7 +186,7 @@
     won = true;
     stopTimer();
     elapsed = Math.floor((Date.now() - startedAt) / 1000);
-    best = LazyStorage.updateBestLow(BEST_KEY, moves);
+    best = LazyStorage.updateBestLow(bestKey(difficulty), moves);
     updateHud();
     refreshLobbyStats();
     const msg =
@@ -170,7 +200,9 @@
 
   function reset() {
     stopTimer();
-    const pool = pickSymbols();
+    const cfg = DIFFS[difficulty] || DIFFS.medium;
+    pairCount = cfg.pairs;
+    const pool = pickSymbols(pairCount);
     const deck = shuffle(pool.concat(pool));
     cards = deck.map((symbol) => ({ symbol, flipped: false, matched: false }));
     flipped = [];
@@ -180,7 +212,7 @@
     startedAt = 0;
     elapsed = 0;
     won = false;
-    best = LazyStorage.get(BEST_KEY, null);
+    best = LazyStorage.get(bestKey(difficulty), null);
     if (best != null) best = Number(best);
     if (global.LazyLeaderboard) LazyLeaderboard.resetRound();
     hideOverlay();
@@ -188,9 +220,19 @@
     render();
   }
 
+  function setDifficulty(diff) {
+    if (!DIFFS[diff]) return;
+    difficulty = diff;
+    hideOverlay();
+    reset();
+  }
+
   function bind() {
     if (bound) return;
     bound = true;
+    document.querySelectorAll('[data-memory-diff]').forEach((btn) => {
+      btn.addEventListener('click', () => setDifficulty(btn.getAttribute('data-memory-diff')));
+    });
     document.getElementById('memory-restart')?.addEventListener('click', reset);
     document.getElementById('memory-again')?.addEventListener('click', reset);
     document.getElementById('memory-exit')?.addEventListener('click', () => {
@@ -202,12 +244,17 @@
   function refreshLobbyStats() {
     const el = document.querySelector('[data-stat="memory"]');
     if (!el) return;
-    const v = LazyStorage.get(BEST_KEY, null);
-    el.textContent = v == null ? 'Best: -' : 'Best: ' + v + ' moves';
+    migrateLegacyBest();
+    const parts = ['easy', 'medium', 'hard'].map((d) => {
+      const v = LazyStorage.get(bestKey(d), null);
+      return DIFFS[d].label[0] + ':' + (v == null ? '-' : String(v));
+    });
+    el.textContent = parts.join(' | ');
   }
 
   function mount() {
     bind();
+    migrateLegacyBest();
     reset();
     refreshLobbyStats();
   }
@@ -217,5 +264,5 @@
     hideOverlay();
   }
 
-  global.MemoryGame = { mount, unmount, refreshLobbyStats, BEST_KEY };
+  global.MemoryGame = { mount, unmount, refreshLobbyStats, DIFFS, bestKey };
 })(typeof window !== 'undefined' ? window : globalThis);

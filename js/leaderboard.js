@@ -18,7 +18,7 @@
       minesweeper: { easy: [], medium: [], hard: [] },
       sudoku: { easy: [], medium: [], hard: [] },
       tictactoe: [],
-      memory: [],
+      memory: { easy: [], medium: [], hard: [] },
       twenty48: [],
       breakout: [],
     };
@@ -81,9 +81,18 @@
       );
     }
 
-    ['minesweeper', 'sudoku'].forEach((game) => {
+    ['minesweeper', 'sudoku', 'memory'].forEach((game) => {
       const src = data[game];
-      if (!src || typeof src !== 'object' || Array.isArray(src)) return;
+      if (!src) return;
+      // Migrate legacy flat memory[] into medium; never wipe other games
+      if (game === 'memory' && Array.isArray(src)) {
+        board.memory.medium = sortList(
+          'memory',
+          src.map((e) => normalizeEntry(e, 'memory')).filter(Boolean)
+        );
+        return;
+      }
+      if (typeof src !== 'object' || Array.isArray(src)) return;
       DIFFS.forEach((d) => {
         if (!Array.isArray(src[d])) return;
         board[game][d] = sortList(
@@ -100,7 +109,7 @@
       );
     }
 
-    ['memory', 'twenty48', 'breakout'].forEach((game) => {
+    ['twenty48', 'breakout'].forEach((game) => {
       if (!Array.isArray(data[game])) return;
       board[game] = sortList(
         game,

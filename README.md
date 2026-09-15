@@ -36,7 +36,7 @@ Then open the URL it prints (for example http://localhost:3000).
 | **Minesweeper** | Click to reveal. Right-click or long-press to flag. |
 | **Tic-Tac-Toe** | Click a cell. Play vs a friend or vs the AI. |
 | **Sudoku** | Click a cell, then use the number pad or keys 1–9. Delete clears. |
-| **Memory Match** | Click cards to flip. Match all pairs; fewer moves is better. |
+| **Memory Match** | Click cards to flip. Easy / Medium / Hard board sizes. Match all pairs; fewer moves is better. |
 | **2048** | Arrows, WASD, swipe, or on-screen pad. Merge tiles to raise your score. |
 | **Breakout** | Mouse, touch, or arrows move the paddle. Space / click launches or pauses. |
 
@@ -44,7 +44,7 @@ Personal bests for the in-game HUD stay in this browser.
 
 ## Leaderboard
 
-The lobby **Leaderboard** shows a **top 10** list per game (Snake, Minesweeper, Tic-Tac-Toe, Sudoku, Memory, 2048, Breakout). Minesweeper and Sudoku also split Easy / Medium / Hard.
+The lobby **Leaderboard** shows a **top 10** list per game (Snake, Minesweeper, Tic-Tac-Toe, Sudoku, Memory, 2048, Breakout). Minesweeper, Sudoku, and Memory also split Easy / Medium / Hard.
 
 When you finish a run, you can optionally enter a name. Only scores that earn a top-10 spot are saved. Scores stay **on this device** (browser storage) — there is currently no shared/global board for the demo.
 

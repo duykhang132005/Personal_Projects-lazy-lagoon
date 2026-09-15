@@ -57,7 +57,7 @@
           <button type="button" class="game-card" data-route="/memory">
             <h2>Memory Match</h2>
             <p>Flip pairs for the right match! Fewer moves wins.</p>
-            <span class="stat" data-stat="memory">Best: -</span>
+            <span class="stat" data-stat="memory">E:- | M:- | H:-</span>
           </button>
           <button type="button" class="game-card" data-route="/2048">
             <h2>2048</h2>
@@ -189,8 +189,15 @@
             <button type="button" class="btn btn-sm" id="memory-restart">Restart</button>
           </div>
           <div class="game-stage">
-            <div id="memory-board" class="memory-board" role="grid" aria-label="Memory board"></div>
-            <p class="hint">Flip two cards. Match all pairs with as few moves as you can.</p>
+            <div class="side-panel">
+              <div class="diff-group" role="group" aria-label="Board size">
+                <button type="button" class="btn btn-sm" data-memory-diff="easy">Easy</button>
+                <button type="button" class="btn btn-sm active" data-memory-diff="medium">Medium</button>
+                <button type="button" class="btn btn-sm" data-memory-diff="hard">Hard</button>
+              </div>
+              <p class="hint">Flip two cards. Match all pairs with as few moves as you can.</p>
+            </div>
+            <div id="memory-board" class="memory-board medium" role="grid" aria-label="Memory board"></div>
           </div>
         </div>
       </section>
