@@ -1,4 +1,4 @@
-/* Lazy Lagoon - device-local leaderboard (localStorage only) */
+/* Lazy Lagoon - shared seed JSON + device-local overlay */
 (function (global) {
   const STORAGE_KEY = 'leaderboard.local';
   const LEGACY_PENDING_KEY = 'leaderboard.pending';
@@ -8,7 +8,10 @@
   const GAMES = ['snake', 'minesweeper', 'tictactoe', 'sudoku', 'memory', 'twenty48', 'breakout'];
   const DIFFS = ['easy', 'medium', 'hard'];
 
+  const SEED_PATH = 'data/leaderboard-seed.json';
+
   let boardCache = null;
+  let seedCache = null;
   let roundSubmitted = false;
   let uiState = { game: 'snake', difficulty: 'easy' };
 
@@ -38,7 +41,7 @@
   }
 
   function needsDifficulty(game) {
-    return game === 'minesweeper' || game === 'sudoku' || game === 'memory';
+    return game === 'minesweeper' || game === 'sudoku' || game === 'memory' || game === 'breakout';
   }
 
   function normalizeEntry(raw, game) {
@@ -165,12 +168,59 @@
     return setList(board, game, difficulty, list);
   }
 
-  function loadBoard() {
-    if (boardCache) return cloneBoard(boardCache);
+  function entryKey(e) {
+    return String(e.name) + '\0' + String(e.score) + '\0' + String(e.at);
+  }
 
+  function mergeList(game, seedList, localList) {
+    const seen = new Set();
+    const out = [];
+    (seedList || []).concat(localList || []).forEach((e) => {
+      if (!e) return;
+      const k = entryKey(e);
+      if (seen.has(k)) return;
+      seen.add(k);
+      out.push(e);
+    });
+    return sortList(game, out);
+  }
+
+  function mergeBoards(seed, local) {
+    const s = seed || emptyBoard();
+    const l = local || emptyBoard();
+    const out = emptyBoard();
+
+    out.snake = mergeList('snake', s.snake, l.snake);
+    out.tictactoe = mergeList('tictactoe', s.tictactoe, l.tictactoe);
+    out.twenty48 = mergeList('twenty48', s.twenty48, l.twenty48);
+    out.breakout = mergeList('breakout', s.breakout, l.breakout);
+
+    DIFFS.forEach((d) => {
+      out.minesweeper[d] = mergeList('minesweeper', s.minesweeper[d], l.minesweeper[d]);
+      out.sudoku[d] = mergeList('sudoku', s.sudoku[d], l.sudoku[d]);
+      out.memory[d] = mergeList('memory', s.memory[d], l.memory[d]);
+    });
+
+    return out;
+  }
+
+  async function loadSeed() {
+    try {
+      const res = await fetch(SEED_PATH + '?t=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      seedCache = normalizeBoard(data);
+    } catch {
+      seedCache = emptyBoard();
+    }
+    boardCache = null;
+    return seedCache;
+  }
+
+  /** Device-only overlay from localStorage (never the seed). */
+  function loadLocalOverlay() {
     let raw = LazyStorage.get(STORAGE_KEY, null);
     if (!raw) {
-      // One-time migrate from the old pending key (worker-era local overlay)
       raw = LazyStorage.get(LEGACY_PENDING_KEY, null);
       if (raw) {
         LazyStorage.set(STORAGE_KEY, raw);
@@ -181,22 +231,32 @@
         }
       }
     }
-
-    boardCache = normalizeBoard(raw);
-    return cloneBoard(boardCache);
+    return normalizeBoard(raw);
   }
 
-  function saveBoard(board) {
+  function saveLocalOverlay(board) {
     const normalized = normalizeBoard(board);
     LazyStorage.set(STORAGE_KEY, normalized);
-    boardCache = cloneBoard(normalized);
+    boardCache = null;
     try {
       LazyStorage.set(LEGACY_KEY, null);
       LazyStorage.set(LEGACY_PENDING_KEY, null);
     } catch {
       /* ignore */
     }
+    return cloneBoard(normalized);
+  }
+
+  function loadBoard() {
+    if (boardCache) return cloneBoard(boardCache);
+    const merged = mergeBoards(seedCache || emptyBoard(), loadLocalOverlay());
+    boardCache = cloneBoard(merged);
     return cloneBoard(boardCache);
+  }
+
+  /** Persist device overlay only — never write the merged seed+local board. */
+  function saveBoard(board) {
+    return saveLocalOverlay(board);
   }
 
   async function fetchBoard() {
@@ -265,8 +325,9 @@
       return { ok: false, message: 'Invalid score.' };
     }
 
-    const board = loadBoard();
-    if (!qualifies(board, game, difficulty, score)) {
+    const local = loadLocalOverlay();
+    const merged = mergeBoards(seedCache || emptyBoard(), local);
+    if (!qualifies(merged, game, difficulty, score)) {
       return {
         ok: false,
         worthy: false,
@@ -285,8 +346,8 @@
     );
     if (!entry) return { ok: false, message: 'Invalid score.' };
 
-    insertEntry(board, game, difficulty, entry);
-    saveBoard(board);
+    insertEntry(local, game, difficulty, entry);
+    saveLocalOverlay(local);
     roundSubmitted = true;
 
     return {
@@ -490,7 +551,7 @@
     panel.innerHTML = '';
     panel.appendChild(renderTable(uiState.game, list));
 
-    note.textContent = 'Top 10 on this device (browser storage).';
+    note.textContent = 'Top 10 (shared seed + this device).';
   }
 
   function showModal() {
@@ -511,14 +572,36 @@
   function bindUi() {
     document.getElementById('btn-leaderboard')?.addEventListener('click', showModal);
     document.getElementById('lb-close')?.addEventListener('click', hideModal);
-    document.getElementById('lb-refresh')?.addEventListener('click', () => {
+    document.getElementById('lb-refresh')?.addEventListener('click', async () => {
       boardCache = null;
+      await loadSeed();
       renderModal();
+    });
+    document.getElementById('lb-export-seed')?.addEventListener('click', () => {
+      downloadSeedJson();
     });
     document.getElementById('lb-overlay')?.addEventListener('click', (e) => {
       if (e.target && e.target.id === 'lb-overlay') hideModal();
     });
     bindScoreForms(document);
+  }
+
+  function exportSeedJson() {
+    const board = loadBoard();
+    return JSON.stringify(board, null, 2).replace(/\n/g, '\r\n') + '\r\n';
+  }
+
+  function downloadSeedJson() {
+    const text = exportSeedJson();
+    const blob = new Blob([text], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'leaderboard-seed.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   function scoreFormHtml() {
@@ -546,8 +629,15 @@
     hideModal,
     renderModal,
     fetchBoard,
+    loadSeed,
+    loadBoard,
+    loadLocalOverlay,
+    mergeBoards,
+    exportSeedJson,
+    downloadSeedJson,
     emptyBoard,
     normalizeBoard,
     scoreFormHtml,
+    ready: loadSeed,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -8,10 +8,10 @@ Open it, pick a game, chase a high score.
 
 Serve the folder (recommended) or open index.html in your browser:
 
-`bash
+```bash
 npx --yes serve .
 # or: python -m http.server 8080
-`
+```
 
 Then open the URL it prints (for example http://localhost:3000).
 
@@ -46,22 +46,23 @@ Personal bests for the in-game HUD stay in this browser.
 
 The lobby **Leaderboard** shows a **top 10** list per game (Snake, Minesweeper, Tic-Tac-Toe, Sudoku, Memory, 2048, Breakout). Minesweeper, Sudoku, and Memory also split Easy / Medium / Hard.
 
-When you finish a run, you can optionally enter a name. Only scores that earn a top-10 spot are saved. Scores stay **on this device** (browser storage) — there is currently no shared/global board for the demo.
+Published scores ship in `data/leaderboard-seed.json` (committed with the site). Each browser also keeps a **device overlay** in localStorage (`leaderboard.local`) for scores submitted on that machine only. The UI merges seed + overlay. Use **Export seed** in the leaderboard modal to download the merged board and overwrite the seed file when refreshing published tops.
 
-- **Snake / 2048** — higher score wins
-- **Minesweeper / Sudoku / Breakout** — faster time (seconds) wins
+- **Snake / 2048 / Breakout** — higher score wins
+- **Minesweeper / Sudoku** — faster time (seconds) wins
 - **Memory Match** — fewer moves wins
 - **Tic-Tac-Toe** — recent wins (up to 10)
 
 ## Project layout
 
-`
+```
 lazy-lagoon/
   index.html
   css/styles.css
   js/           # games, lobby, leaderboard, lake background
+  data/leaderboard-seed.json
   assets/favicon.svg
-`
+```
 
 Plain HTML, CSS, and JS. No build step.
 

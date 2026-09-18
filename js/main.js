@@ -87,9 +87,12 @@
     document.getElementById('brand-home')?.addEventListener('click', () => navigate('/'));
   }
 
-  function init() {
+  async function init() {
     LazyLoader.init();
-    if (window.LazyLeaderboard) LazyLeaderboard.bindUi();
+    if (window.LazyLeaderboard) {
+      await LazyLeaderboard.loadSeed();
+      LazyLeaderboard.bindUi();
+    }
     bindLobby();
     window.addEventListener('hashchange', () => { route(); });
     refreshAllStats();
@@ -97,7 +100,7 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', () => { init(); });
   } else {
     init();
   }

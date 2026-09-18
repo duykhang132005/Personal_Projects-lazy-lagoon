@@ -1,0 +1,9 @@
+{
+  "snake": [],
+  "minesweeper": { "easy": [], "medium": [], "hard": [] },
+  "sudoku": { "easy": [], "medium": [], "hard": [] },
+  "tictactoe": [],
+  "memory": { "easy": [], "medium": [], "hard": [] },
+  "twenty48": [],
+  "breakout": []
+}
