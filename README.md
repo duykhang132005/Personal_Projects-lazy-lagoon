@@ -13,7 +13,7 @@ npx --yes serve .
 # or: python -m http.server 8080
 ```
 
-Then open the URL it prints (for example http://localhost:3000).
+Then open the URL.
 
 ### Routes
 
@@ -46,10 +46,10 @@ Personal bests for the in-game HUD stay in this browser.
 
 The lobby **Leaderboard** shows a **top 10** list per game (Snake, Minesweeper, Tic-Tac-Toe, Sudoku, Memory, 2048, Breakout). Minesweeper, Sudoku, and Memory also split Easy / Medium / Hard.
 
-Published scores ship in `data/leaderboard-seed.json` (committed with the site). Each browser also keeps a **device overlay** in localStorage (`leaderboard.local`) for scores submitted on that machine only. The UI merges seed + overlay. Use **Export seed** in the leaderboard modal to download the merged board and overwrite the seed file when refreshing published tops.
+Published scores ship in `data/leaderboard-seed.json` (committed with the site). Each browser also keeps a **device overlay** in localStorage (`leaderboard.local`) for scores submitted on that machine only.
 
-- **Snake / 2048 / Breakout** — higher score wins
-- **Minesweeper / Sudoku** — faster time (seconds) wins
+- **Snake / 2048** — higher score wins
+- **Minesweeper / Sudoku / Breakout** — faster time wins
 - **Memory Match** — fewer moves wins
 - **Tic-Tac-Toe** — recent wins (up to 10)
 

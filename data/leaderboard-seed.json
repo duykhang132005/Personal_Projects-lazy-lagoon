@@ -1,9 +1,67 @@
 {
-  "snake": [],
-  "minesweeper": { "easy": [], "medium": [], "hard": [] },
-  "sudoku": { "easy": [], "medium": [], "hard": [] },
+  "snake": [
+    {
+      "name": "Khang",
+      "score": 20,
+      "at": "2026-09-05T02:50:16.398Z"
+    }
+  ],
+  "minesweeper": {
+    "easy": [
+      {
+        "name": "Khang",
+        "score": 21,
+        "at": "2026-09-18T01:25:45.006Z"
+      },
+      {
+        "name": "Khang",
+        "score": 33,
+        "at": "2026-09-05T18:51:57.956Z"
+      }
+    ],
+    "medium": [],
+    "hard": []
+  },
+  "sudoku": {
+    "easy": [],
+    "medium": [],
+    "hard": []
+  },
   "tictactoe": [],
-  "memory": { "easy": [], "medium": [], "hard": [] },
-  "twenty48": [],
+  "memory": {
+    "easy": [
+      {
+        "name": "Khang",
+        "score": 10,
+        "at": "2026-09-18T01:23:59.914Z"
+      },
+      {
+        "name": "Khang",
+        "score": 11,
+        "at": "2026-09-18T01:22:57.047Z"
+      }
+    ],
+    "medium": [
+      {
+        "name": "Khang",
+        "score": 11,
+        "at": "2026-09-15T14:13:37.973Z"
+      }
+    ],
+    "hard": [
+      {
+        "name": "Khang",
+        "score": 22,
+        "at": "2026-09-18T01:24:40.895Z"
+      }
+    ]
+  },
+  "twenty48": [
+    {
+      "name": "Khang",
+      "score": 3444,
+      "at": "2026-09-15T14:14:45.180Z"
+    }
+  ],
   "breakout": []
 }

@@ -41,7 +41,7 @@
   }
 
   function needsDifficulty(game) {
-    return game === 'minesweeper' || game === 'sudoku' || game === 'memory' || game === 'breakout';
+    return game === 'minesweeper' || game === 'sudoku' || game === 'memory';
   }
 
   function normalizeEntry(raw, game) {
@@ -577,45 +577,11 @@
       await loadSeed();
       renderModal();
     });
-    document.getElementById('lb-export-seed')?.addEventListener('click', () => {
-      downloadSeedJson();
-    });
     document.getElementById('lb-overlay')?.addEventListener('click', (e) => {
       if (e.target && e.target.id === 'lb-overlay') hideModal();
     });
     bindScoreForms(document);
   }
-
-  function exportSeedJson() {
-    const board = loadBoard();
-    return JSON.stringify(board, null, 2).replace(/\n/g, '\r\n') + '\r\n';
-  }
-
-  function downloadSeedJson() {
-    const text = exportSeedJson();
-    const blob = new Blob([text], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'leaderboard-seed.json';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-
-  function scoreFormHtml() {
-    return (
-      '<div class="score-submit" data-score-form hidden>' +
-      '<label class="score-label">Name (optional)' +
-      '<input type="text" class="score-name" maxlength="16" autocomplete="nickname" placeholder="Your name" />' +
-      '</label>' +
-      '<button type="button" class="btn" data-submit-score>Submit score</button>' +
-      '<p class="score-submit-msg hint" hidden></p>' +
-      '</div>'
-    );
-  }
-
   global.LazyLeaderboard = {
     sanitizeName,
     submit,
@@ -633,8 +599,6 @@
     loadBoard,
     loadLocalOverlay,
     mergeBoards,
-    exportSeedJson,
-    downloadSeedJson,
     emptyBoard,
     normalizeBoard,
     scoreFormHtml,
