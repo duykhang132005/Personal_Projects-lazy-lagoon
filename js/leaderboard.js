@@ -601,7 +601,6 @@
     mergeBoards,
     emptyBoard,
     normalizeBoard,
-    scoreFormHtml,
     ready: loadSeed,
   };
 })(typeof window !== 'undefined' ? window : globalThis);
