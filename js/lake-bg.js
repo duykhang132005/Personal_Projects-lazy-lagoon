@@ -20,6 +20,7 @@
   let t = 0;
   let raf = 0;
   let lastTs = 0;
+  let running = false;
 
   const pads = [];
   const ripples = [];
@@ -229,7 +230,12 @@
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, w, h * 0.35);
 
-    raf = requestAnimationFrame(frame);
+    if (running && !document.hidden) {
+      raf = requestAnimationFrame(frame);
+    } else {
+      raf = 0;
+      running = false;
+    }
   }
 
   function onMove(e) {
@@ -248,18 +254,40 @@
     addRipple(e.clientX, e.clientY, 5 + Math.random() * 3);
   }
 
+  function stopLoop() {
+    if (raf) {
+      cancelAnimationFrame(raf);
+      raf = 0;
+    }
+    running = false;
+  }
+
+  function startLoop() {
+    if (reduced || running || document.hidden) return;
+    running = true;
+    lastTs = 0;
+    raf = requestAnimationFrame(frame);
+  }
+
+  function onVisibility() {
+    if (document.hidden) stopLoop();
+    else startLoop();
+  }
+
   function start() {
     resize();
     window.addEventListener('resize', resize);
     window.addEventListener('mousemove', onMove, { passive: true });
     window.addEventListener('click', onClick, { passive: true });
+    document.addEventListener('visibilitychange', onVisibility);
     if (reduced) {
       // one static paint
       lastTs = performance.now();
+      running = true;
       frame(lastTs);
-      cancelAnimationFrame(raf);
+      stopLoop();
     } else {
-      raf = requestAnimationFrame(frame);
+      startLoop();
     }
   }
 
