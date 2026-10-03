@@ -396,8 +396,8 @@
 
   <!-- Leaderboard modal -->
   <div id="lb-overlay" class="overlay" aria-hidden="true">
-    <div class="overlay-card overlay-card-wide">
-      <h3>Leaderboard</h3>
+    <div class="overlay-card overlay-card-wide" role="dialog" aria-modal="true" aria-labelledby="lb-title">
+      <h3 id="lb-title">Leaderboard</h3>
       <div id="lb-modal-body" class="lb-body"></div>
       <div class="overlay-actions">
         <button type="button" class="btn btn-ghost" id="lb-refresh">Refresh</button>

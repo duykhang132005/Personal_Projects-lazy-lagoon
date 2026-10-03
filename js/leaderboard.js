@@ -12,6 +12,8 @@
 
   let boardCache = null;
   let seedCache = null;
+  let seedFailed = false;
+  let lastFocus = null;
   let roundSubmitted = false;
   let uiState = { game: 'snake', difficulty: 'easy' };
 
@@ -210,8 +212,10 @@
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       seedCache = normalizeBoard(data);
+      seedFailed = false;
     } catch {
       seedCache = emptyBoard();
+      seedFailed = true;
     }
     boardCache = null;
     return seedCache;
@@ -257,10 +261,6 @@
   /** Persist device overlay only — never write the merged seed+local board. */
   function saveBoard(board) {
     return saveLocalOverlay(board);
-  }
-
-  async function fetchBoard() {
-    return loadBoard();
   }
 
   function formatScore(game, entry) {
@@ -482,14 +482,18 @@
 
   function syncTabButtons(root) {
     root.querySelectorAll('[data-lb-game]').forEach((btn) => {
-      btn.classList.toggle('active', btn.getAttribute('data-lb-game') === uiState.game);
+      const on = btn.getAttribute('data-lb-game') === uiState.game;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-selected', on ? 'true' : 'false');
     });
     const sub = root.querySelector('.lb-subtabs');
     if (sub) {
       const show = needsDifficulty(uiState.game);
       sub.hidden = !show;
       sub.querySelectorAll('[data-lb-diff]').forEach((btn) => {
-        btn.classList.toggle('active', btn.getAttribute('data-lb-diff') === uiState.difficulty);
+        const on = btn.getAttribute('data-lb-diff') === uiState.difficulty;
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
       });
     }
   }
@@ -514,7 +518,7 @@
         '<div class="lb-subtabs diff-group" role="tablist" aria-label="Difficulty" hidden>' +
         DIFFS.map(
           (d) =>
-            '<button type="button" class="btn btn-sm" data-lb-diff="' +
+            '<button type="button" class="btn btn-sm" role="tab" data-lb-diff="' +
             d +
             '">' +
             d.charAt(0).toUpperCase() +
@@ -551,15 +555,20 @@
     panel.innerHTML = '';
     panel.appendChild(renderTable(uiState.game, list));
 
-    note.textContent = 'Top 10 (shared seed + this device).';
+    note.textContent = seedFailed
+      ? 'Shared scores could not load. Serve the site over http (not file://) to see them. Showing this device only.'
+      : 'Top 10 (shared seed + this device).';
   }
 
   function showModal() {
     const ov = document.getElementById('lb-overlay');
     if (!ov) return;
+    lastFocus = document.activeElement;
     ov.classList.add('visible');
     ov.setAttribute('aria-hidden', 'false');
     renderModal();
+    const closeBtn = document.getElementById('lb-close');
+    if (closeBtn) closeBtn.focus();
   }
 
   function hideModal() {
@@ -567,6 +576,38 @@
     if (!ov) return;
     ov.classList.remove('visible');
     ov.setAttribute('aria-hidden', 'true');
+    if (lastFocus && typeof lastFocus.focus === 'function' && document.contains(lastFocus)) {
+      lastFocus.focus();
+    }
+    lastFocus = null;
+  }
+
+  function onModalKey(e) {
+    const ov = document.getElementById('lb-overlay');
+    if (!ov || !ov.classList.contains('visible')) return;
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      hideModal();
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const items = Array.from(ov.querySelectorAll('button:not([disabled])')).filter(
+      (b) => !b.closest('[hidden]')
+    );
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (!ov.contains(document.activeElement)) {
+      e.preventDefault();
+      first.focus();
+    } else if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
   }
 
   function bindUi() {
@@ -580,6 +621,7 @@
     document.getElementById('lb-overlay')?.addEventListener('click', (e) => {
       if (e.target && e.target.id === 'lb-overlay') hideModal();
     });
+    document.addEventListener('keydown', onModalKey, true);
     bindScoreForms(document);
   }
   global.LazyLeaderboard = {
@@ -594,13 +636,11 @@
     showModal,
     hideModal,
     renderModal,
-    fetchBoard,
     loadSeed,
     loadBoard,
     loadLocalOverlay,
     mergeBoards,
     emptyBoard,
     normalizeBoard,
-    ready: loadSeed,
   };
 })(typeof window !== 'undefined' ? window : globalThis);

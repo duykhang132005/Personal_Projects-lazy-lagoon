@@ -6,7 +6,7 @@ Open it, pick a game, chase a high score.
 
 ## Play
 
-Serve the folder (recommended) or open index.html in your browser:
+Serve the folder over http (recommended) or open index.html in your browser. The shared seed scores on the leaderboard only load over http, so opening the file directly (file://) shows just this device's scores:
 
 ```bash
 npx --yes serve .
