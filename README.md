@@ -61,8 +61,9 @@ lazy-lagoon/
   css/styles.css
   js/           # games, lobby, leaderboard, lake background
   data/leaderboard-seed.json
-  assets/favicon.svg
+  assets/lazy-lagoon-logo.svg
   tools/smoke-test.js   # dev-only, not part of the site
+  .github/workflows/smoke-test.yml
 ```
 
 Plain HTML, CSS, and JS. No build step.
@@ -82,7 +83,9 @@ npm i --no-save --prefix tools puppeteer-core
 node tools/smoke-test.js
 ```
 
-Chrome defaults to `C:/Program Files/Google/Chrome/Application/chrome.exe`. Set `CHROME_PATH` to use another browser binary. `tools/node_modules` is gitignored.
+Chrome defaults to the standard install path for Windows, macOS, or Linux. Set `CHROME_PATH` to use another browser binary. `tools/node_modules` is gitignored.
+
+GitHub Actions runs the same smoke test on every push to `main` and on every pull request: see `.github/workflows/smoke-test.yml`. It uses the runner's preinstalled Google Chrome.
 
 ## License
 

@@ -2,3 +2,6 @@
 Thumbs.db
 tools/node_modules/
 tools/package-lock.json
+server/
+js/leaderboard-config.js
+online-leaderboard-wip/

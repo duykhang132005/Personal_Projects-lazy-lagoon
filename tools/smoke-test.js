@@ -10,7 +10,8 @@
  *   npm i --no-save --prefix tools puppeteer-core
  * Run from the project root:
  *   node tools/smoke-test.js
- * Chrome path: defaults to the standard Windows install. Override with CHROME_PATH.
+ * Chrome path: defaults to the standard install for Windows, macOS, or Linux. Override with CHROME_PATH.
+ * On Linux or CI, Chrome runs with --no-sandbox (needed on GitHub Actions runners).
  */
 'use strict';
 
@@ -27,7 +28,17 @@ try {
 }
 
 const ROOT = path.resolve(__dirname, '..');
-const CHROME = process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
+const IS_LINUX = process.platform === 'linux';
+const IS_CI = !!process.env.CI;
+
+function defaultChrome() {
+  if (process.platform === 'win32') return 'C:/Program Files/Google/Chrome/Application/chrome.exe';
+  if (process.platform === 'darwin') return '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+  const candidates = ['/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium', '/usr/bin/chromium-browser'];
+  return candidates.find((p) => fs.existsSync(p)) || candidates[0];
+}
+
+const CHROME = process.env.CHROME_PATH || defaultChrome();
 const ROUTES = ['#/', '#/snake', '#/minesweeper', '#/tictactoe', '#/sudoku', '#/memory', '#/2048', '#/breakout'];
 const TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -130,11 +141,14 @@ async function main() {
   }
   const server = await startServer();
   const base = 'http://127.0.0.1:' + server.address().port + '/index.html';
+  const args = ['--no-first-run', '--no-default-browser-check'];
+  if (IS_LINUX || IS_CI) args.push('--no-sandbox', '--disable-dev-shm-usage');
   const browser = await puppeteer.launch({
     executablePath: CHROME,
     headless: true,
-    args: ['--no-first-run', '--no-default-browser-check'],
+    args,
   });
+  console.log('Chrome: ' + CHROME);
 
   let failed = 0;
   try {

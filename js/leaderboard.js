@@ -258,7 +258,7 @@
     return cloneBoard(boardCache);
   }
 
-  /** Persist device overlay only — never write the merged seed+local board. */
+  /** Persist device overlay only (never write the merged seed+local board). */
   function saveBoard(board) {
     return saveLocalOverlay(board);
   }
@@ -331,7 +331,7 @@
       return {
         ok: false,
         worthy: false,
-        message: 'Not a top-10 score — keep playing!',
+        message: 'Not a top-10 score. Keep playing!',
       };
     }
 

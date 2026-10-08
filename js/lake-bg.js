@@ -244,7 +244,7 @@
   }
 
   function onClick(e) {
-    // ignore clicks on interactive UI so we don't steal focus feel —
+    // ignore clicks on interactive UI so we don't steal focus feel.
     // splash is decorative only; canvas has pointer-events:none
     const tag = (e.target && e.target.tagName) || '';
     if (/BUTTON|INPUT|A|CANVAS|TD|SELECT|TEXTAREA/.test(tag)) {

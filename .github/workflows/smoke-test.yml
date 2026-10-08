@@ -1,0 +1,37 @@
+# Headless smoke test for Lazy Lagoon: loads every route in Chrome and opens the leaderboard.
+name: Smoke test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: lts/*
+          package-manager-cache: false
+
+      - name: Install puppeteer-core (not saved to the repo)
+        run: npm i --no-save --prefix tools puppeteer-core
+
+      - name: Smoke test (preinstalled Chrome)
+        run: |
+          CHROME_PATH="$(command -v google-chrome || command -v google-chrome-stable || true)"
+          if [ -z "$CHROME_PATH" ]; then echo "Google Chrome not found on runner"; exit 1; fi
+          export CHROME_PATH
+          "$CHROME_PATH" --version
+          node tools/smoke-test.js
