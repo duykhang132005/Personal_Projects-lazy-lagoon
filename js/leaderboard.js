@@ -438,7 +438,7 @@
     if (!list.length) {
       const empty = document.createElement('p');
       empty.className = 'hint';
-      empty.textContent = 'No scores yet — be the first!';
+      empty.textContent = 'No scores yet. Be the first!';
       wrap.appendChild(empty);
       return wrap;
     }

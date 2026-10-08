@@ -82,7 +82,8 @@
     const minesLeft = document.getElementById('ms-mines');
     const timeEl = document.getElementById('ms-time');
     const bestEl = document.getElementById('ms-best');
-    if (minesLeft) minesLeft.textContent = String(mineCount - flagged);
+    // aria-live pill: write on change only (updateHud also runs every timer tick).
+    if (minesLeft && minesLeft.textContent !== String(mineCount - flagged)) minesLeft.textContent = String(mineCount - flagged);
     if (timeEl) timeEl.textContent = LazyStorage.formatTime(elapsed);
     const best = LazyStorage.get(bestKey(difficulty), null);
     if (bestEl) {

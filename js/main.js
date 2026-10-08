@@ -79,6 +79,36 @@
     BreakoutGame.refreshLobbyStats();
   }
 
+  // Game overlays are aria-hidden until shown, so a live region inside them would not be
+  // announced. Mirror the overlay title and message into one persistent live region instead.
+  function bindOverlayAnnouncer() {
+    const live = document.getElementById('sr-announcer');
+    if (!live || typeof MutationObserver === 'undefined') return;
+    let pending = 0;
+    const announce = (ov) => {
+      const h = ov.querySelector('h3');
+      const p = ov.querySelector('p');
+      const title = h ? h.textContent.trim() : '';
+      const msg = p ? p.textContent.trim() : '';
+      let text = title;
+      if (msg) text = title ? title + (/[.!?]$/.test(title) ? ' ' : '. ') + msg : msg;
+      if (!text) return;
+      live.textContent = '';
+      clearTimeout(pending);
+      pending = setTimeout(() => { live.textContent = text; }, 60);
+    };
+    const obs = new MutationObserver((records) => {
+      records.forEach((r) => {
+        const ov = r.target;
+        if (ov.getAttribute('aria-hidden') === 'false' && r.oldValue !== 'false') announce(ov);
+      });
+    });
+    document.querySelectorAll('.overlay').forEach((ov) => {
+      if (ov.id === 'loader-overlay' || ov.id === 'lb-overlay') return;
+      obs.observe(ov, { attributes: true, attributeFilter: ['aria-hidden'], attributeOldValue: true });
+    });
+  }
+
   function bindLobby() {
     document.querySelectorAll('[data-route]').forEach((el) => {
       el.addEventListener('click', () => navigate(el.getAttribute('data-route')));
@@ -94,6 +124,7 @@
       LazyLeaderboard.bindUi();
     }
     bindLobby();
+    bindOverlayAnnouncer();
     window.addEventListener('hashchange', () => { route(); });
     refreshAllStats();
     route();

@@ -48,10 +48,10 @@ The lobby **Leaderboard** shows a **top 10** list per game (Snake, Minesweeper, 
 
 Published scores ship in `data/leaderboard-seed.json` (committed with the site). Each browser also keeps a **device overlay** in localStorage (`leaderboard.local`) for scores submitted on that machine only.
 
-- **Snake / 2048** — higher score wins
-- **Minesweeper / Sudoku / Breakout** — faster time wins
-- **Memory Match** — fewer moves wins
-- **Tic-Tac-Toe** — recent wins (up to 10)
+- **Snake / 2048**: higher score wins
+- **Minesweeper / Sudoku / Breakout**: faster time wins
+- **Memory Match**: fewer moves wins
+- **Tic-Tac-Toe**: recent wins (up to 10)
 
 ## Project layout
 
@@ -62,6 +62,7 @@ lazy-lagoon/
   js/           # games, lobby, leaderboard, lake background
   data/leaderboard-seed.json
   assets/favicon.svg
+  tools/smoke-test.js   # dev-only, not part of the site
 ```
 
 Plain HTML, CSS, and JS. No build step.
@@ -70,6 +71,19 @@ Plain HTML, CSS, and JS. No build step.
 
 Animations ease off when prefers-reduced-motion is set.
 
+Snake and Breakout pause automatically when you switch tabs (press Resume to carry on), and Breakout's clear time does not count time spent away. Score changes, game over, win, and pause messages are announced to screen readers.
+
+## Development
+
+`tools/smoke-test.js` is a dev-only headless check. It serves the folder on a local port, opens every route in Chrome, opens the leaderboard, and fails on any page error or console error. It needs Node 18+ and a local Chrome install. Nothing is added to the repo:
+
+```bash
+npm i --no-save --prefix tools puppeteer-core
+node tools/smoke-test.js
+```
+
+Chrome defaults to `C:/Program Files/Google/Chrome/Application/chrome.exe`. Set `CHROME_PATH` to use another browser binary. `tools/node_modules` is gitignored.
+
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).

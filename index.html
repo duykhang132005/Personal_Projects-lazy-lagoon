@@ -77,7 +77,7 @@
         <div class="game-layout">
           <div class="game-toolbar">
             <h2>Snake</h2>
-            <span class="stat-pill">Score: <strong id="snake-score">0</strong></span>
+            <span class="stat-pill" aria-live="polite" aria-atomic="true">Score: <strong id="snake-score">0</strong></span>
             <span class="stat-pill">Best: <strong id="snake-best">0</strong></span>
             <button type="button" class="btn btn-sm" id="snake-pause">Pause</button>
             <button type="button" class="btn btn-sm" id="snake-restart">Restart</button>
@@ -102,7 +102,7 @@
         <div class="game-layout">
           <div class="game-toolbar">
             <h2>Minesweeper</h2>
-            <span class="stat-pill">Mines: <strong id="ms-mines">10</strong></span>
+            <span class="stat-pill" aria-live="polite" aria-atomic="true">Mines: <strong id="ms-mines">10</strong></span>
             <span class="stat-pill">Time: <strong id="ms-time">0:00</strong></span>
             <span class="stat-pill">Best: <strong id="ms-best">-</strong></span>
             <button type="button" class="btn btn-sm" id="ms-new">New</button>
@@ -126,7 +126,7 @@
         <div class="game-layout">
           <div class="game-toolbar">
             <h2>Tic-Tac-Toe</h2>
-            <span class="stat-pill" id="ttt-status">X's turn</span>
+            <span class="stat-pill" id="ttt-status" aria-live="polite" aria-atomic="true">X's turn</span>
             <button type="button" class="btn btn-sm" id="ttt-rematch">Rematch</button>
           </div>
           <div class="game-stage">
@@ -171,7 +171,7 @@
                 <button type="button" class="btn" data-sudoku-num="9">9</button>
                 <button type="button" class="btn btn-ghost" id="sudoku-clear">Clear</button>
               </div>
-              <p class="hint" id="sudoku-check-msg">Tap a cell, then a number. Keys 1-9 / Delete.</p>
+              <p class="hint" id="sudoku-check-msg" aria-live="polite" aria-atomic="true">Tap a cell, then a number. Keys 1-9 / Delete.</p>
             </div>
             <div id="sudoku-board" class="sudoku-board" role="grid" aria-label="Sudoku board"></div>
           </div>
@@ -183,7 +183,7 @@
         <div class="game-layout">
           <div class="game-toolbar">
             <h2>Memory Match</h2>
-            <span class="stat-pill">Moves: <strong id="memory-moves">0</strong></span>
+            <span class="stat-pill" aria-live="polite" aria-atomic="true">Moves: <strong id="memory-moves">0</strong></span>
             <span class="stat-pill">Time: <strong id="memory-time">0:00</strong></span>
             <span class="stat-pill">Best: <strong id="memory-best">-</strong></span>
             <button type="button" class="btn btn-sm" id="memory-restart">Restart</button>
@@ -207,7 +207,7 @@
         <div class="game-layout">
           <div class="game-toolbar">
             <h2>2048</h2>
-            <span class="stat-pill">Score: <strong id="t48-score">0</strong></span>
+            <span class="stat-pill" aria-live="polite" aria-atomic="true">Score: <strong id="t48-score">0</strong></span>
             <span class="stat-pill">Best: <strong id="t48-best">0</strong></span>
             <button type="button" class="btn btn-sm" id="t48-new">New game</button>
           </div>
@@ -229,8 +229,8 @@
         <div class="game-layout">
           <div class="game-toolbar">
             <h2>Breakout</h2>
-            <span class="stat-pill">Score: <strong id="breakout-score">0</strong></span>
-            <span class="stat-pill">Lives: <strong id="breakout-lives">3</strong></span>
+            <span class="stat-pill" aria-live="polite" aria-atomic="true">Score: <strong id="breakout-score">0</strong></span>
+            <span class="stat-pill" aria-live="polite" aria-atomic="true">Lives: <strong id="breakout-lives">3</strong></span>
             <span class="stat-pill">Time: <strong id="breakout-time">0:00</strong></span>
             <span class="stat-pill">Best: <strong id="breakout-best">-</strong></span>
             <button type="button" class="btn btn-sm" id="breakout-pause">Pause</button>
@@ -247,6 +247,9 @@
 
     </main>
   </div>
+
+  <!-- Screen reader announcements for game overlays (game over, win, paused). Filled by js/main.js. -->
+  <div id="sr-announcer" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
 
   <!-- Global loading overlay -->
   <div id="loader-overlay" class="overlay" aria-hidden="true" role="status" aria-live="polite">

@@ -65,7 +65,7 @@
     const m = document.getElementById('memory-moves');
     const t = document.getElementById('memory-time');
     const b = document.getElementById('memory-best');
-    if (m) m.textContent = String(moves);
+    if (m && m.textContent !== String(moves)) m.textContent = String(moves); // aria-live pill, write on change only
     if (t) t.textContent = LazyStorage.formatTime(elapsed);
     if (b) b.textContent = best == null ? '-' : String(best);
     document.querySelectorAll('[data-memory-diff]').forEach((btn) => {

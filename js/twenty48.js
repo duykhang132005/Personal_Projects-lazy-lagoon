@@ -32,7 +32,7 @@
   function updateHud() {
     const s = document.getElementById('t48-score');
     const b = document.getElementById('t48-best');
-    if (s) s.textContent = String(score);
+    if (s && s.textContent !== String(score)) s.textContent = String(score); // aria-live pill, write on change only
     if (b) b.textContent = String(best);
   }
 
@@ -153,7 +153,7 @@
 
     if (won && !wonAck) {
       wonAck = true;
-      showOverlay('2048!', 'Score: ' + score + ' — keep going or start fresh.', false, { continue: true });
+      showOverlay('2048!', 'Score: ' + score + '. Keep going or start fresh.', false, { continue: true });
       return;
     }
 

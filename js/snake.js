@@ -68,8 +68,9 @@
   function updateHud() {
     const s = document.getElementById('snake-score');
     const b = document.getElementById('snake-best');
-    if (s) s.textContent = String(score);
-    if (b) b.textContent = String(best);
+    // Only write on change: the score pill is an aria-live region.
+    if (s && s.textContent !== String(score)) s.textContent = String(score);
+    if (b && b.textContent !== String(best)) b.textContent = String(best);
   }
 
   function setDir(nx, ny) {
@@ -100,6 +101,13 @@
       hideOverlay();
       timer = setInterval(tick, tickMs);
     }
+  }
+
+  // Auto-pause when the tab is hidden. No auto-resume: the player resumes manually.
+  function onVisibility() {
+    if (!document.hidden) return;
+    if (!wrap || !wrap.classList.contains('active')) return;
+    if (running && !paused && !dead) pause();
   }
 
   function gameOver() {
@@ -243,6 +251,7 @@
     if (boundKeys) return;
     boundKeys = true;
     document.addEventListener('keydown', onKey);
+    document.addEventListener('visibilitychange', onVisibility);
     // Restart / Play Again: reset board but do NOT start tick until first direction input
     document.getElementById('snake-restart')?.addEventListener('click', () => { reset(); });
     document.getElementById('snake-pause')?.addEventListener('click', () => {

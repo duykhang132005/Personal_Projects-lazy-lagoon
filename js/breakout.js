@@ -31,6 +31,7 @@
   let pauseStartedAt = 0;
   let elapsed = 0;
   let timerId = null;
+  let hiddenAt = 0;
 
   const COLORS = ['#39ff14', '#7ec8ff', '#ff9f1c', '#ff5ec8'];
 
@@ -116,8 +117,9 @@
     const l = document.getElementById('breakout-lives');
     const t = document.getElementById('breakout-time');
     const b = document.getElementById('breakout-best');
-    if (s) s.textContent = String(score);
-    if (l) l.textContent = String(lives);
+    // Only write on change: score and lives pills are aria-live regions and this runs every 250ms.
+    if (s && s.textContent !== String(score)) s.textContent = String(score);
+    if (l && l.textContent !== String(lives)) l.textContent = String(lives);
     if (t) t.textContent = LazyStorage.formatTime(elapsed);
     if (b) b.textContent = best == null ? '-' : LazyStorage.formatTime(best);
     const pauseBtn = document.getElementById('breakout-pause');
@@ -345,6 +347,28 @@
     updateHud();
   }
 
+  // Auto-pause when the tab is hidden. No auto-resume: the player resumes manually.
+  // togglePause() freezes the clock via pauseStartedAt, so hidden time never counts.
+  // Between lives (ball waiting to relaunch) the clock still runs but there is nothing
+  // to pause, so hidden time is subtracted from startedAt when the tab comes back.
+  function onVisibility() {
+    const view = document.getElementById('view-breakout');
+    const active = !!view && view.classList.contains('active');
+    if (document.hidden) {
+      if (!active || over || paused) return;
+      if (running) togglePause();
+      else if (startedAt && timerId) hiddenAt = Date.now();
+      return;
+    }
+    if (!hiddenAt) return;
+    if (startedAt && !over && !paused && !running) {
+      startedAt += Date.now() - hiddenAt;
+      syncElapsed();
+      updateHud();
+    }
+    hiddenAt = 0;
+  }
+
   function loadBest() {
     const v = LazyStorage.get(BEST_KEY, null);
     if (v != null && Number.isFinite(Number(v))) return Number(v);
@@ -365,6 +389,7 @@
     paused = false;
     startedAt = 0;
     pauseStartedAt = 0;
+    hiddenAt = 0;
     elapsed = 0;
     paddleX = (W - PADDLE_W) / 2;
     best = loadBest();
@@ -415,6 +440,7 @@
     bound = true;
     document.addEventListener('keydown', onKey);
     document.addEventListener('keyup', onKey);
+    document.addEventListener('visibilitychange', onVisibility);
     document.getElementById('breakout-restart')?.addEventListener('click', reset);
     document.getElementById('breakout-pause')?.addEventListener('click', () => {
       if (!running && !paused && !over) return;
