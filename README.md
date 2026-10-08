@@ -74,19 +74,6 @@ Animations ease off when prefers-reduced-motion is set.
 
 Snake and Breakout pause automatically when you switch tabs (press Resume to carry on), and Breakout's clear time does not count time spent away. Score changes, game over, win, and pause messages are announced to screen readers.
 
-## Development
-
-`tools/smoke-test.js` is a dev-only headless check. It serves the folder on a local port, opens every route in Chrome, opens the leaderboard, and fails on any page error or console error. It needs Node 18+ and a local Chrome install. Nothing is added to the repo:
-
-```bash
-npm i --no-save --prefix tools puppeteer-core
-node tools/smoke-test.js
-```
-
-Chrome defaults to the standard install path for Windows, macOS, or Linux. Set `CHROME_PATH` to use another browser binary. `tools/node_modules` is gitignored.
-
-GitHub Actions runs the same smoke test on every push to `main` and on every pull request: see `.github/workflows/smoke-test.yml`. It uses the runner's preinstalled Google Chrome.
-
 ## License
 
 MIT. See [LICENSE](LICENSE).
