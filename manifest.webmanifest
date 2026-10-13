@@ -1,0 +1,15 @@
+{
+  "name": "Lazy Lagoon",
+  "short_name": "Lazy Lagoon",
+  "description": "Lazy Lagoon - neon arcade: Snake, Minesweeper, Tic-Tac-Toe, Sudoku, Memory, 2048, Breakout",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#041018",
+  "theme_color": "#041018",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "assets/lazy-lagoon-logo.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

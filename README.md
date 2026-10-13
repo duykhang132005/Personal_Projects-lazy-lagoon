@@ -15,6 +15,8 @@ npx --yes serve .
 
 Then open the URL.
 
+On the live site (or any http server) you can install Lazy Lagoon as an app from the browser menu, and after one visit it keeps working offline. Leaderboard seed scores refresh whenever you are online.
+
 ### Routes
 
 | Path | Game |
@@ -61,7 +63,9 @@ lazy-lagoon/
   css/styles.css
   js/           # games, lobby, leaderboard, lake background
   data/leaderboard-seed.json
-  assets/lazy-lagoon-logo.svg
+  assets/lazy-lagoon-logo.svg   # plus og-image.png, icon-192.png, icon-512.png
+  manifest.webmanifest
+  sw.js         # service worker (offline play)
   tools/smoke-test.js   # dev-only, not part of the site
   .github/workflows/smoke-test.yml
 ```

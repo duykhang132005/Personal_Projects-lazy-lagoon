@@ -117,8 +117,22 @@
     document.getElementById('brand-home')?.addEventListener('click', () => navigate('/'));
   }
 
+  // Offline play: only over http(s), never from file://. Failure is harmless (the site still works).
+  function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+    const go = () => {
+      navigator.serviceWorker.register('sw.js', { scope: './' }).catch((err) => {
+        console.warn('Lazy Lagoon: offline support unavailable.', err && err.message ? err.message : err);
+      });
+    };
+    if (document.readyState === 'complete') go();
+    else window.addEventListener('load', go, { once: true });
+  }
+
   async function init() {
     LazyLoader.init();
+    registerServiceWorker();
     if (window.LazyLeaderboard) {
       await LazyLeaderboard.loadSeed();
       LazyLeaderboard.bindUi();
