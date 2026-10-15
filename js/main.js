@@ -117,10 +117,52 @@
     document.getElementById('brand-home')?.addEventListener('click', () => navigate('/'));
   }
 
+  // "Updated" toast: shown only when a NEW service worker takes over a page that was
+  // already controlled (never on the first install), at most once per page. No auto-reload.
+  let updateToastShown = false;
+
+  function showUpdateToast() {
+    if (updateToastShown || document.getElementById('update-toast')) return;
+    updateToastShown = true;
+    const toast = document.createElement('div');
+    toast.id = 'update-toast';
+    toast.className = 'update-toast';
+    toast.setAttribute('role', 'status');
+    toast.setAttribute('aria-live', 'polite');
+    document.body.appendChild(toast);
+
+    const reload = document.createElement('button');
+    reload.type = 'button';
+    reload.className = 'update-toast-reload';
+    reload.textContent = 'Updated. Tap to reload.';
+    reload.addEventListener('click', () => location.reload());
+
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.className = 'update-toast-close';
+    close.setAttribute('aria-label', 'Dismiss update notice');
+    close.textContent = '\u00d7';
+    const dismiss = () => toast.remove();
+    close.addEventListener('click', dismiss);
+    toast.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') dismiss();
+    });
+
+    // Fill the live region after it is in the DOM so screen readers announce it.
+    setTimeout(() => {
+      toast.appendChild(reload);
+      toast.appendChild(close);
+    }, 50);
+  }
+
   // Offline play: only over http(s), never from file://. Failure is harmless (the site still works).
   function registerServiceWorker() {
     if (!('serviceWorker' in navigator)) return;
     if (location.protocol !== 'http:' && location.protocol !== 'https:') return;
+    const hadController = !!navigator.serviceWorker.controller;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (hadController) showUpdateToast();
+    });
     const go = () => {
       navigator.serviceWorker.register('sw.js', { scope: './' }).catch((err) => {
         console.warn('Lazy Lagoon: offline support unavailable.', err && err.message ? err.message : err);

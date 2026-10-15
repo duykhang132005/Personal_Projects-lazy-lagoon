@@ -19,11 +19,18 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # full history so the cache version guard can diff the whole pushed range
 
       - uses: actions/setup-node@v7
         with:
           node-version: lts/*
           package-manager-cache: false
+
+      - name: Cache version guard (shipped files changed => CACHE_VERSION bumped)
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: node tools/check-cache-version.js "$BASE_SHA"
 
       - name: Install puppeteer-core (not saved to the repo)
         run: npm i --no-save --prefix tools puppeteer-core

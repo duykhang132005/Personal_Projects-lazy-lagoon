@@ -8,7 +8,7 @@
  * Bump CACHE_VERSION whenever you ship changes so old caches get cleaned up.
  */
 const CACHE_PREFIX = 'lazy-lagoon-';
-const CACHE_VERSION = 'v1';
+const CACHE_VERSION = 'v2';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 
 // Paths relative to the registration scope. js/leaderboard-config.js is intentionally not here.
