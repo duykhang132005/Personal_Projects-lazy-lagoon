@@ -242,6 +242,9 @@ function runStaticChecks() {
     }
   });
 
+  // Install essentials must always be precached, even if the HTML or manifest stops referencing them.
+  ['manifest.webmanifest', 'assets/icon-192.png', 'assets/icon-512.png'].forEach((n) => required.add(n));
+
   // Precache must cover every required shipped file. og-image is optional.
   const optionalInPrecache = new Set(['assets/og-image.png']);
   [...required].sort().forEach((n) => {

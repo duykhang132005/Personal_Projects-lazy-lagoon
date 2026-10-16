@@ -68,6 +68,11 @@ function versionOf(swText) {
   return m ? m[2] : null;
 }
 
+function nextVersion(v) {
+  const m = String(v).match(/^(.*?)(\d+)$/);
+  return m ? m[1] + (Number(m[2]) + 1) : v + '-2';
+}
+
 function isShipped(file, precache) {
   if (file === 'sw.js') return false;
   if (file === 'js/leaderboard-config.js') return false;
@@ -120,7 +125,9 @@ function main() {
   }
   if (vBase === vHead) {
     console.error('cache-version: FAIL, shipped files changed in ' + range + ' but CACHE_VERSION is still "' + vHead + '".');
-    console.error('Bump CACHE_VERSION in sw.js (for example ' + vHead + ' -> next) so installed copies refresh. Changed:');
+    const nv = nextVersion(vHead);
+    const pre = (swHead.match(/\bCACHE_PREFIX\s*=\s*(['"])(.*?)\1/) || [])[2] || '';
+    console.error('Next step: bump CACHE_VERSION to ' + nv + ' in sw.js' + (pre ? ' (cache name ' + pre + nv + ')' : '') + ' so installed copies refresh. Changed:');
     shipped.forEach((f) => console.error('  - ' + f));
     return 1;
   }

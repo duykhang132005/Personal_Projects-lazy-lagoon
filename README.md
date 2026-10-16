@@ -72,6 +72,8 @@ lazy-lagoon/
 
 Plain HTML, CSS, and JS. No build step.
 
+Before pushing, run `npm run check` (static checks plus the service worker cache-version guard, no dependencies).
+
 ## Accessibility
 
 Animations ease off when prefers-reduced-motion is set.

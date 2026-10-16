@@ -12,27 +12,9 @@ if ! command -v node >/dev/null 2>&1; then
   exit 0
 fi
 
-echo "pre-push: static checks"
-if ! node tools/smoke-test.js --static-only; then
-  echo "pre-push: push blocked, static checks failed."
+if ! node tools/check.js; then
+  echo "pre-push: push blocked (see above). Skip once with: git push --no-verify"
   exit 1
-fi
-
-base=""
-if git rev-parse --verify --quiet '@{u}' >/dev/null 2>&1; then
-  base="$(git rev-parse '@{u}')"
-elif git rev-parse --verify --quiet origin/main >/dev/null 2>&1; then
-  base="$(git rev-parse origin/main)"
-fi
-
-if [ -n "$base" ]; then
-  echo "pre-push: cache version check against $base"
-  if ! node tools/check-cache-version.js "$base"; then
-    echo "pre-push: push blocked, bump CACHE_VERSION in sw.js."
-    exit 1
-  fi
-else
-  echo "pre-push: no upstream or origin/main, skipping cache version check."
 fi
 
 exit 0

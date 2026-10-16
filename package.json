@@ -1,0 +1,7 @@
+{
+  "name": "lazy-lagoon",
+  "private": true,
+  "scripts": {
+    "check": "node tools/check.js"
+  }
+}
