@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 /*
  * Lazy Lagoon: one command for the pre-push checks (npm run check, or node tools/check.js).
- * Runs the static smoke checks, then the CACHE_VERSION guard against @{u} or origin/main.
+ * Runs the static smoke checks, then the CACHE_VERSION guard against a base ref.
+ * Base: first argument, else CHECK_BASE env (CI passes the push or PR base sha), else @{u} or
+ * origin/main. An explicit empty or all-zero base is handed through so the guard skips cleanly.
  * The pre-push hook in .githooks calls this same file. Node built-ins only.
  */
 'use strict';
@@ -34,7 +36,8 @@ if (run('tools/smoke-test.js', ['--static-only']) !== 0) {
   process.exit(1);
 }
 
-const base = rev('@{u}') || rev('origin/main');
+const explicit = process.argv[2] !== undefined ? process.argv[2] : process.env.CHECK_BASE;
+const base = explicit !== undefined ? String(explicit).trim() || '0' : rev('@{u}') || rev('origin/main');
 if (!base) {
   console.log('check: no upstream or origin/main, skipping cache version check.');
   process.exit(0);

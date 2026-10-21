@@ -220,9 +220,29 @@
     render();
   }
 
+  const DIFF_KEY = 'lazy-lagoon.memory.difficulty';
+
+  function loadDifficulty() {
+    try {
+      const v = localStorage.getItem(DIFF_KEY);
+      return v && Object.prototype.hasOwnProperty.call(DIFFS, v) ? v : 'medium';
+    } catch {
+      return 'medium';
+    }
+  }
+
+  function saveDifficulty(v) {
+    try {
+      localStorage.setItem(DIFF_KEY, v);
+    } catch {
+      /* storage unavailable (private mode or quota); keep the in-memory value */
+    }
+  }
+
   function setDifficulty(diff) {
     if (!DIFFS[diff]) return;
     difficulty = diff;
+    saveDifficulty(diff);
     hideOverlay();
     reset();
   }
@@ -255,6 +275,7 @@
   function mount() {
     bind();
     migrateLegacyBest();
+    difficulty = loadDifficulty();
     reset();
     refreshLobbyStats();
   }

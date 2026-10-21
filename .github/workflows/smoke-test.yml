@@ -27,10 +27,10 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
 
-      - name: Cache version guard (shipped files changed => CACHE_VERSION bumped)
+      - name: Static checks and cache version guard (npm run check)
         env:
-          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
-        run: node tools/check-cache-version.js "$BASE_SHA"
+          CHECK_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: npm run check
 
       - name: Install puppeteer-core (not saved to the repo)
         run: npm i --no-save --prefix tools puppeteer-core
