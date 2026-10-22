@@ -12,7 +12,37 @@
     '/breakout': 'breakout',
   };
 
+  const TITLES = {
+    lobby: 'Lazy Lagoon',
+    snake: 'Snake',
+    minesweeper: 'Minesweeper',
+    tictactoe: 'Tic-Tac-Toe',
+    sudoku: 'Sudoku',
+    memory: 'Memory Match',
+    '2048': '2048',
+    breakout: 'Breakout',
+  };
+
   let current = null;
+
+  // Move focus after a view change: back on the lobby, the card of the game just left;
+  // in a game, its heading (tabindex=-1, so it is focusable but not in the Tab order).
+  function moveFocus(name, prev) {
+    let target = null;
+    if (name === 'lobby') {
+      if (prev && prev !== 'lobby') target = document.querySelector('#view-lobby .game-card[data-route="/' + prev + '"]');
+    } else {
+      target = document.querySelector('#view-' + name + ' h2');
+      if (target && !target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    }
+    if (!target) return;
+    try {
+      target.focus({ preventScroll: true });
+    } catch {
+      target.focus();
+    }
+    if (name === 'lobby' && target.scrollIntoView) target.scrollIntoView({ block: 'nearest' });
+  }
 
   function parseHash() {
     let h = location.hash || '#/';
@@ -60,14 +90,13 @@
   async function route() {
     const path = parseHash();
     const name = ROUTES[path] || ROUTES[path.toLowerCase()] || 'lobby';
+    const prev = current;
     if (current && current !== name) unmountCurrent();
     current = name;
     showView(name);
+    document.title = name === 'lobby' ? TITLES.lobby : (TITLES[name] || name) + ' - Lazy Lagoon';
     await mount(name);
-    document.title =
-      name === 'lobby'
-        ? 'Lazy Lagoon'
-        : name.charAt(0).toUpperCase() + name.slice(1) + ' - Lazy Lagoon';
+    if (prev && prev !== name && current === name) moveFocus(name, prev);
   }
 
   function refreshAllStats() {

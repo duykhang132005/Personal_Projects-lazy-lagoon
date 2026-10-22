@@ -205,8 +205,30 @@
     render();
   }
 
+  const DIFF_KEY = 'lazy-lagoon.sudoku.difficulty';
+
+  function loadDifficulty() {
+    try {
+      const v = localStorage.getItem(DIFF_KEY);
+      return v && Object.prototype.hasOwnProperty.call(DIFF, v) ? v : 'easy';
+    } catch {
+      return 'easy';
+    }
+  }
+
+  function saveDifficulty(v) {
+    try {
+      localStorage.setItem(DIFF_KEY, v);
+    } catch {
+      /* storage unavailable (private mode or quota); keep the in-memory value */
+    }
+  }
+
   async function newPuzzle(diff) {
-    if (diff) difficulty = diff;
+    if (diff && DIFF[diff]) {
+      difficulty = diff;
+      saveDifficulty(diff);
+    }
     try {
       const data = await LazyLoader.run('Generating Sudoku', (report) =>
         generatePuzzle(difficulty, report)
@@ -381,7 +403,12 @@
     hideOverlay();
     refreshLobbyStats();
     if (!puzzle) {
-      await newPuzzle(difficulty);
+      difficulty = loadDifficulty();
+      // Show the restored level right away; the puzzle itself is generated async.
+      document.querySelectorAll('[data-sudoku-diff]').forEach((btn) => {
+        btn.classList.toggle('active', btn.getAttribute('data-sudoku-diff') === difficulty);
+      });
+      await newPuzzle();
     } else {
       updateHud();
       render();

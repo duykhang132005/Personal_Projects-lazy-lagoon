@@ -35,12 +35,14 @@ On the live site (or any http server) you can install Lazy Lagoon as an app from
 | Game | How to play |
 |------|-------------|
 | **Snake** | Arrows or WASD (also starts the run), or the on-screen pad. Space pauses. |
-| **Minesweeper** | Click to reveal. Right-click or long-press to flag. |
+| **Minesweeper** | Click to reveal. Right-click or long-press to flag. Easy / Medium / Hard boards. |
 | **Tic-Tac-Toe** | Click a cell. Play vs a friend or vs the AI. |
-| **Sudoku** | Click a cell, then use the number pad or keys 1–9. Delete clears. |
+| **Sudoku** | Click a cell, then use the number pad or keys 1–9. Delete clears. Easy / Medium / Hard puzzles. |
 | **Memory Match** | Click cards to flip. Easy / Medium / Hard board sizes. Match all pairs; fewer moves is better. |
 | **2048** | Arrows, WASD, swipe, or on-screen pad. Merge tiles to raise your score. |
 | **Breakout** | Mouse, touch, or arrows move the paddle. Space / click launches or pauses. |
+
+Minesweeper, Sudoku, and Memory Match remember the difficulty you picked last.
 
 Personal bests for the in-game HUD stay in this browser.
 

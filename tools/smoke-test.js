@@ -349,6 +349,26 @@ async function checkRoute(browser, base, route) {
   return errors;
 }
 
+// prefers-reduced-motion: reduce must drop the lobby card hover lift (transform stays none).
+async function checkReducedMotion(browser, base) {
+  const page = await browser.newPage();
+  const errors = [];
+  try {
+    await page.emulateMediaFeatures([{ name: 'prefers-reduced-motion', value: 'reduce' }]);
+    await page.goto(base + '#/', { waitUntil: 'load', timeout: 20000 });
+    await page.waitForSelector('#view-lobby.active .game-card', { timeout: 10000 });
+    await page.hover('#view-lobby .game-card');
+    await sleep(250);
+    const tr = await page.$eval('#view-lobby .game-card', (el) => getComputedStyle(el).transform);
+    if (tr !== 'none') errors.push('reduced motion: lobby card still lifts on hover (transform ' + tr + ')');
+  } catch (e) {
+    errors.push('reduced motion check failed: ' + e.message);
+  } finally {
+    await page.close();
+  }
+  return errors;
+}
+
 async function main() {
   if (!printStaticSummary(runStaticChecks())) process.exit(1);
   if (STATIC_ONLY) {
@@ -392,16 +412,24 @@ async function main() {
         console.log('ok   ' + route);
       }
     }
+    const rm = await checkReducedMotion(browser, base);
+    if (rm.length) {
+      failed++;
+      console.log('FAIL reduced-motion');
+      rm.forEach((e) => console.log('  - ' + e));
+    } else {
+      console.log('ok   reduced-motion (no hover lift)');
+    }
   } finally {
     await browser.close();
     server.close();
   }
 
   if (failed) {
-    console.log('\n' + failed + ' of ' + ROUTES.length + ' routes failed.');
+    console.log('\n' + failed + ' check(s) failed (' + ROUTES.length + ' routes + reduced-motion).');
     process.exit(1);
   }
-  console.log('\nAll ' + ROUTES.length + ' routes passed.');
+  console.log('\nAll ' + ROUTES.length + ' routes and the reduced-motion check passed.');
 }
 
 main().catch((e) => {

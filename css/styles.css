@@ -240,6 +240,10 @@ a:hover { text-shadow: var(--neon-glow); }
   outline: none;
 }
 
+/* Game headings get programmatic focus on open: ring only when the user is on the keyboard. */
+.view h2[tabindex="-1"]:focus { outline: none; }
+.view h2[tabindex="-1"]:focus-visible { outline: 2px solid var(--neon); outline-offset: 4px; border-radius: 4px; }
+
 /* Keyboard focus only (not mouse clicks): solid neon ring on lobby cards. */
 .game-card:focus-visible {
   outline: 2px solid var(--neon);
