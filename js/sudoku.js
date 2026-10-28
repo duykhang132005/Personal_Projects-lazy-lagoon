@@ -185,7 +185,9 @@
     const best = LazyStorage.get(bestKey(difficulty), null);
     if (b) b.textContent = best == null ? '-' : LazyStorage.formatTime(best);
     document.querySelectorAll('[data-sudoku-diff]').forEach((btn) => {
-      btn.classList.toggle('active', btn.getAttribute('data-sudoku-diff') === difficulty);
+      const on = btn.getAttribute('data-sudoku-diff') === difficulty;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
   }
 
@@ -236,7 +238,7 @@
       applyPuzzle(data);
     } catch (err) {
       console.error(err);
-      alert('Could not generate puzzle. Try again.');
+      showGenerateError();
     }
   }
 
@@ -306,6 +308,7 @@
     if (!ov) return;
     ov.querySelector('h3').textContent = title;
     ov.querySelector('p').textContent = msg;
+    setAgainLabel('New puzzle');
     if (global.LazyLeaderboard) {
       LazyLeaderboard.fillScoreForm(ov, {
         show: true,
@@ -320,6 +323,31 @@
     }
     ov.classList.add('visible');
     ov.setAttribute('aria-hidden', 'false');
+  }
+
+  function setAgainLabel(text) {
+    const again = document.getElementById('sudoku-again');
+    if (again) again.textContent = text;
+  }
+
+  // Generation failed: reuse the overlay (announced through #sr-announcer by main.js) with a retry.
+  function showGenerateError() {
+    const ov = document.getElementById('sudoku-overlay');
+    if (!ov) return;
+    ov.querySelector('h3').textContent = "Couldn't generate a puzzle.";
+    ov.querySelector('p').textContent = 'Try again, or pick another difficulty.';
+    if (global.LazyLeaderboard) LazyLeaderboard.fillScoreForm(ov, { show: false });
+    setAgainLabel('Try again');
+    ov.classList.add('visible');
+    ov.setAttribute('aria-hidden', 'false');
+    const again = document.getElementById('sudoku-again');
+    if (again) {
+      try {
+        again.focus({ preventScroll: true });
+      } catch {
+        again.focus();
+      }
+    }
   }
 
   function hideOverlay() {
@@ -406,7 +434,9 @@
       difficulty = loadDifficulty();
       // Show the restored level right away; the puzzle itself is generated async.
       document.querySelectorAll('[data-sudoku-diff]').forEach((btn) => {
-        btn.classList.toggle('active', btn.getAttribute('data-sudoku-diff') === difficulty);
+        const on = btn.getAttribute('data-sudoku-diff') === difficulty;
+        btn.classList.toggle('active', on);
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
       await newPuzzle();
     } else {

@@ -431,6 +431,7 @@ a:hover { text-shadow: var(--neon-glow); }
   flex-direction: column;
   align-items: center;
   gap: 1rem;
+  width: 100%; /* measure the stage, not the canvas, so resize can shrink it again */
 }
 
 #snake-canvas {

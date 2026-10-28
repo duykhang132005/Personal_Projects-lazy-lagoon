@@ -129,9 +129,9 @@
           <div class="game-stage">
             <div class="side-panel">
               <div class="diff-group" role="group" aria-label="Difficulty">
-                <button type="button" class="btn btn-sm active" data-ms-diff="easy">Easy</button>
-                <button type="button" class="btn btn-sm" data-ms-diff="medium">Medium</button>
-                <button type="button" class="btn btn-sm" data-ms-diff="hard">Hard</button>
+                <button type="button" class="btn btn-sm active" data-ms-diff="easy" aria-pressed="true">Easy</button>
+                <button type="button" class="btn btn-sm" data-ms-diff="medium" aria-pressed="false">Medium</button>
+                <button type="button" class="btn btn-sm" data-ms-diff="hard" aria-pressed="false">Hard</button>
               </div>
               <p class="hint">Left-click reveal | Right-click / long-press flag</p>
             </div>
@@ -151,8 +151,8 @@
           <div class="game-stage">
             <div class="side-panel">
               <div class="mode-toggle diff-group" role="group" aria-label="Game mode">
-                <button type="button" class="btn btn-sm" data-ttt-mode="pvp">PvP</button>
-                <button type="button" class="btn btn-sm active" data-ttt-mode="pvai">PvAI</button>
+                <button type="button" class="btn btn-sm" data-ttt-mode="pvp" aria-pressed="false">PvP</button>
+                <button type="button" class="btn btn-sm active" data-ttt-mode="pvai" aria-pressed="true">PvAI</button>
               </div>
               <p class="hint">Magic square win: three numbers summing to 15.</p>
             </div>
@@ -174,9 +174,9 @@
           <div class="game-stage">
             <div class="side-panel">
               <div class="diff-group" role="group" aria-label="Difficulty">
-                <button type="button" class="btn btn-sm active" data-sudoku-diff="easy">Easy</button>
-                <button type="button" class="btn btn-sm" data-sudoku-diff="medium">Medium</button>
-                <button type="button" class="btn btn-sm" data-sudoku-diff="hard">Hard</button>
+                <button type="button" class="btn btn-sm active" data-sudoku-diff="easy" aria-pressed="true">Easy</button>
+                <button type="button" class="btn btn-sm" data-sudoku-diff="medium" aria-pressed="false">Medium</button>
+                <button type="button" class="btn btn-sm" data-sudoku-diff="hard" aria-pressed="false">Hard</button>
               </div>
               <div class="numpad" aria-label="Number pad">
                 <button type="button" class="btn" data-sudoku-num="1">1</button>
@@ -210,9 +210,9 @@
           <div class="game-stage">
             <div class="side-panel">
               <div class="diff-group" role="group" aria-label="Board size">
-                <button type="button" class="btn btn-sm" data-memory-diff="easy">Easy</button>
-                <button type="button" class="btn btn-sm active" data-memory-diff="medium">Medium</button>
-                <button type="button" class="btn btn-sm" data-memory-diff="hard">Hard</button>
+                <button type="button" class="btn btn-sm" data-memory-diff="easy" aria-pressed="false">Easy</button>
+                <button type="button" class="btn btn-sm active" data-memory-diff="medium" aria-pressed="true">Medium</button>
+                <button type="button" class="btn btn-sm" data-memory-diff="hard" aria-pressed="false">Hard</button>
               </div>
               <p class="hint">Flip two cards. Match all pairs with as few moves as you can.</p>
             </div>

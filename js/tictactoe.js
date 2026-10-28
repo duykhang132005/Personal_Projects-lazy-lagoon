@@ -17,6 +17,7 @@
   let winCells;
   let bound = false;
   let aiThinking = false;
+  let aiTimer = 0; // pending AI move; cleared on reset/unmount so it never lands on a new board
   let lastResult = null; // 'X' | 'O' | 'draw'
 
   function emptyBoard() {
@@ -139,7 +140,9 @@
       root.appendChild(btn);
     });
     document.querySelectorAll('[data-ttt-mode]').forEach((b) => {
-      b.classList.toggle('active', b.getAttribute('data-ttt-mode') === mode);
+      const on = b.getAttribute('data-ttt-mode') === mode;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
     statusText();
   }
@@ -164,7 +167,9 @@
     if (mode === 'pvai' && turn === 'O' && !over) {
       aiThinking = true;
       statusText();
-      setTimeout(() => {
+      clearTimeout(aiTimer);
+      aiTimer = setTimeout(() => {
+        aiTimer = 0;
         const move = bestAiMove();
         aiThinking = false;
         if (move != null && board[move] == null) {
@@ -242,6 +247,8 @@
   }
 
   function reset() {
+    clearTimeout(aiTimer);
+    aiTimer = 0;
     board = emptyBoard();
     turn = 'X';
     over = false;
@@ -278,7 +285,11 @@
     reset();
   }
 
-  function unmount() {}
+  function unmount() {
+    clearTimeout(aiTimer);
+    aiTimer = 0;
+    aiThinking = false;
+  }
 
   global.TicTacToeGame = {
     mount,

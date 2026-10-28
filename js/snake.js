@@ -275,7 +275,16 @@
       btn.addEventListener('click', go);
       btn.addEventListener('touchstart', go, { passive: false });
     });
-    window.addEventListener('resize', () => { resize(); draw(); });
+    // Only redraw while this game is on screen; coalesce bursts of resize events into one frame.
+    window.addEventListener('resize', () => {
+      if (!mounted || resizeRaf) return;
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = 0;
+        if (!mounted) return;
+        resize();
+        draw();
+      });
+    });
   }
 
   function refreshLobbyStats() {
@@ -283,7 +292,11 @@
     if (el) el.textContent = 'Best: ' + LazyStorage.getNumber(BEST_KEY, 0);
   }
 
+  let mounted = false;
+  let resizeRaf = 0;
+
   function mount() {
+    mounted = true;
     initDom();
     bind();
     reset();
@@ -291,6 +304,11 @@
   }
 
   function unmount() {
+    mounted = false;
+    if (resizeRaf) {
+      cancelAnimationFrame(resizeRaf);
+      resizeRaf = 0;
+    }
     clearInterval(timer);
     running = false;
     hideOverlay();

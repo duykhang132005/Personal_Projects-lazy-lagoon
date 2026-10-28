@@ -475,7 +475,16 @@
         }
       }, { passive: false });
     }
-    window.addEventListener('resize', () => { resize(); draw(); });
+    // Only redraw while this game is on screen; coalesce bursts of resize events into one frame.
+    window.addEventListener('resize', () => {
+      if (!mounted || resizeRaf) return;
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = 0;
+        if (!mounted) return;
+        resize();
+        draw();
+      });
+    });
   }
 
   function refreshLobbyStats() {
@@ -485,7 +494,11 @@
     el.textContent = v == null ? 'Best: -' : 'Best: ' + LazyStorage.formatTime(Number(v));
   }
 
+  let mounted = false;
+  let resizeRaf = 0;
+
   function mount() {
+    mounted = true;
     initDom();
     bind();
     reset();
@@ -493,6 +506,11 @@
   }
 
   function unmount() {
+    mounted = false;
+    if (resizeRaf) {
+      cancelAnimationFrame(resizeRaf);
+      resizeRaf = 0;
+    }
     cancelAnimationFrame(raf);
     stopTimer();
     running = false;

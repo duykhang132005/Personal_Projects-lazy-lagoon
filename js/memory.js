@@ -21,6 +21,7 @@
   let matched = 0;
   let moves = 0;
   let locked = false;
+  let flipBackTimer = 0; // mismatch flip-back; cleared on reset/unmount so it never touches a new deck
   let startedAt = 0;
   let timerId = null;
   let elapsed = 0;
@@ -69,7 +70,9 @@
     if (t) t.textContent = LazyStorage.formatTime(elapsed);
     if (b) b.textContent = best == null ? '-' : String(best);
     document.querySelectorAll('[data-memory-diff]').forEach((btn) => {
-      btn.classList.toggle('active', btn.getAttribute('data-memory-diff') === difficulty);
+      const on = btn.getAttribute('data-memory-diff') === difficulty;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
   }
 
@@ -171,7 +174,9 @@
     } else {
       locked = true;
       const pending = flipped.slice();
-      setTimeout(() => {
+      clearTimeout(flipBackTimer);
+      flipBackTimer = setTimeout(() => {
+        flipBackTimer = 0;
         pending.forEach((idx) => {
           if (cards[idx] && !cards[idx].matched) cards[idx].flipped = false;
         });
@@ -198,8 +203,14 @@
     showOverlay('All matched!', msg, true);
   }
 
+  function clearFlipBack() {
+    clearTimeout(flipBackTimer);
+    flipBackTimer = 0;
+  }
+
   function reset() {
     stopTimer();
+    clearFlipBack();
     const cfg = DIFFS[difficulty] || DIFFS.medium;
     pairCount = cfg.pairs;
     const pool = pickSymbols(pairCount);
@@ -282,6 +293,14 @@
 
   function unmount() {
     stopTimer();
+    if (flipBackTimer) {
+      clearFlipBack();
+      flipped.forEach((idx) => {
+        if (cards[idx] && !cards[idx].matched) cards[idx].flipped = false;
+      });
+      flipped = [];
+      locked = false;
+    }
     hideOverlay();
   }
 

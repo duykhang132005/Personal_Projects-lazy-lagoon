@@ -90,7 +90,9 @@
       bestEl.textContent = best == null ? '-' : LazyStorage.formatTime(best);
     }
     document.querySelectorAll('[data-ms-diff]').forEach((btn) => {
-      btn.classList.toggle('active', btn.getAttribute('data-ms-diff') === difficulty);
+      const on = btn.getAttribute('data-ms-diff') === difficulty;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
     });
   }
 
@@ -183,23 +185,28 @@
         btn.setAttribute('role', 'gridcell');
         btn.dataset.r = r;
         btn.dataset.c = c;
+        const where = 'Row ' + (r + 1) + ', column ' + (c + 1) + ', ';
 
         if (cell.revealed) {
           btn.classList.add('revealed');
           btn.disabled = true;
           if (cell.mine) {
+            btn.setAttribute('aria-label', where + 'mine');
             btn.classList.add('mine');
             btn.textContent = '✱';
           } else if (cell.adj > 0) {
+            btn.setAttribute('aria-label', where + cell.adj + (cell.adj === 1 ? ' adjacent mine' : ' adjacent mines'));
             btn.classList.add('n' + cell.adj);
             btn.textContent = String(cell.adj);
+          } else {
+            btn.setAttribute('aria-label', where + 'empty');
           }
         } else if (cell.flagged) {
           btn.classList.add('flagged');
           btn.textContent = '⚑';
-          btn.setAttribute('aria-label', 'Flagged');
+          btn.setAttribute('aria-label', where + 'flagged');
         } else {
-          btn.setAttribute('aria-label', 'Hidden cell');
+          btn.setAttribute('aria-label', where + 'hidden');
         }
 
         btn.addEventListener('click', (e) => {
