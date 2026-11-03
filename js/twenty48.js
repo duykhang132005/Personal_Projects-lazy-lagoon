@@ -78,13 +78,19 @@
     if (!board) return;
     board.innerHTML = '';
     for (let r = 0; r < SIZE; r++) {
+      const row = document.createElement('div');
+      row.className = 't48-row';
+      row.setAttribute('role', 'row');
       for (let c = 0; c < SIZE; c++) {
         const v = grid[r][c];
         const cell = document.createElement('div');
         cell.className = tileClass(v);
+        cell.setAttribute('role', 'gridcell');
+        cell.setAttribute('aria-label', 'Row ' + (r + 1) + ', column ' + (c + 1) + ', ' + (v ? String(v) : 'empty'));
         cell.textContent = v ? String(v) : '';
-        board.appendChild(cell);
+        row.appendChild(cell);
       }
+      board.appendChild(row);
     }
   }
 

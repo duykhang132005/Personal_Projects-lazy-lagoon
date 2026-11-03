@@ -297,7 +297,11 @@
       else if (selVal && user[i] === selVal) btn.classList.add('same');
       if (showErrors && user[i] !== 0 && user[i] !== solution[i]) btn.classList.add('error');
       btn.textContent = user[i] ? String(user[i]) : '';
-      btn.setAttribute('aria-label', 'Row ' + (((i / 9) | 0) + 1) + ' column ' + ((i % 9) + 1));
+      let label = 'Row ' + (((i / 9) | 0) + 1) + ', column ' + ((i % 9) + 1) + ', ' + (user[i] ? String(user[i]) : 'empty');
+      if (given[i]) label += ', given';
+      if (showErrors && user[i] !== 0 && user[i] !== solution[i]) label += ', wrong';
+      if (i === selected) label += ', selected';
+      btn.setAttribute('aria-label', label);
       btn.addEventListener('click', () => selectCell(i));
       root.appendChild(btn);
     }

@@ -898,6 +898,7 @@ a:hover { text-shadow: var(--neon-glow); }
   aspect-ratio: 1;
 }
 
+.t48-row { display: contents; }
 .t48-tile.empty { color: transparent; }
 .t48-tile.t2 { background: #0d2a24; color: #9dffb0; }
 .t48-tile.t4 { background: #12382e; color: #b8ff9a; }
