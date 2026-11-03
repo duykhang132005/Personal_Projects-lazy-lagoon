@@ -8,7 +8,7 @@
  * Bump CACHE_VERSION whenever you ship changes so old caches get cleaned up.
  */
 const CACHE_PREFIX = 'lazy-lagoon-';
-const CACHE_VERSION = 'v6';
+const CACHE_VERSION = 'v7';
 const CACHE_NAME = CACHE_PREFIX + CACHE_VERSION;
 
 // Paths relative to the registration scope. js/leaderboard-config.js is intentionally not here.
@@ -25,7 +25,7 @@ const PRECACHE = [
   'js/tictactoe.js',
   'js/sudoku.js',
   'js/memory.js',
-  'js/twenty48.js',
+  'js/2048.js',
   'js/breakout.js',
   'js/lake-bg.js',
   'js/main.js',

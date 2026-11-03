@@ -72,7 +72,7 @@
     else if (current === 'tictactoe') TicTacToeGame.unmount();
     else if (current === 'sudoku') SudokuGame.unmount();
     else if (current === 'memory') MemoryGame.unmount();
-    else if (current === '2048') Twenty48Game.unmount();
+    else if (current === '2048') Game2048.unmount();
     else if (current === 'breakout') BreakoutGame.unmount();
   }
 
@@ -82,7 +82,7 @@
     else if (name === 'tictactoe') TicTacToeGame.mount();
     else if (name === 'sudoku') await SudokuGame.mount();
     else if (name === 'memory') MemoryGame.mount();
-    else if (name === '2048') Twenty48Game.mount();
+    else if (name === '2048') Game2048.mount();
     else if (name === 'breakout') BreakoutGame.mount();
     else refreshAllStats();
   }
@@ -104,7 +104,7 @@
     MinesweeperGame.refreshLobbyStats();
     SudokuGame.refreshLobbyStats();
     MemoryGame.refreshLobbyStats();
-    Twenty48Game.refreshLobbyStats();
+    Game2048.refreshLobbyStats();
     BreakoutGame.refreshLobbyStats();
   }
 

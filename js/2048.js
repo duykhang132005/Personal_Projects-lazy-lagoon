@@ -268,5 +268,5 @@
 
   function unmount() {}
 
-  global.Twenty48Game = { mount, unmount, refreshLobbyStats, BEST_KEY };
+  global.Game2048 = { mount, unmount, refreshLobbyStats, BEST_KEY };
 })(typeof window !== 'undefined' ? window : globalThis);
