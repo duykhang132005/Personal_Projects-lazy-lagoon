@@ -138,6 +138,40 @@
     });
   }
 
+  // Hidden overlays use visibility:hidden so their controls cannot receive focus,
+  // including synchronous focus calls before a MutationObserver could run.
+  function bindOverlayFocus() {
+    document.querySelectorAll('.overlay').forEach((ov) => {
+      let previous = null;
+      const remember = () => {
+        if (!ov.contains(document.activeElement)) previous = document.activeElement;
+      };
+      ov.addEventListener('focusin', () => {
+        if (!previous) previous = lastOutside;
+      });
+      let lastOutside = document.activeElement;
+      document.addEventListener('focusin', (e) => {
+        if (!ov.contains(e.target)) lastOutside = e.target;
+      });
+      new MutationObserver(() => {
+        if (ov.getAttribute('aria-hidden') === 'false') {
+          if (!previous) remember();
+          return;
+        }
+        const active = document.activeElement;
+        if (ov.contains(active) || active === document.body) {
+          let target = previous;
+          if (!target || !target.isConnected || !target.getClientRects().length || target.disabled) {
+            target = document.querySelector('.view.active h2');
+            if (target) target.setAttribute('tabindex', '-1');
+          }
+          if (target) target.focus({ preventScroll: true });
+        }
+        previous = null;
+      }).observe(ov, { attributes: true, attributeFilter: ['aria-hidden'] });
+    });
+  }
+
   function bindLobby() {
     document.querySelectorAll('[data-route]').forEach((el) => {
       el.addEventListener('click', () => navigate(el.getAttribute('data-route')));
@@ -202,6 +236,7 @@
   }
 
   async function init() {
+    bindOverlayFocus();
     LazyLoader.init();
     registerServiceWorker();
     if (window.LazyLeaderboard) {

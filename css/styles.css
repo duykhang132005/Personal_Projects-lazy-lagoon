@@ -377,6 +377,7 @@ a:hover { text-shadow: var(--neon-glow); }
 }
 
 .overlay[aria-hidden="true"] {
+  visibility: hidden;
   pointer-events: none !important;
 }
 
