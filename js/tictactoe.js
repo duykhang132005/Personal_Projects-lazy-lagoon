@@ -289,6 +289,7 @@
     clearTimeout(aiTimer);
     aiTimer = 0;
     aiThinking = false;
+    hideOverlay();
   }
 
   global.TicTacToeGame = {

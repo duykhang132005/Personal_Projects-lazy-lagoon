@@ -266,7 +266,9 @@
     refreshLobbyStats();
   }
 
-  function unmount() {}
+  function unmount() {
+    hideOverlay();
+  }
 
   global.Game2048 = { mount, unmount, refreshLobbyStats, BEST_KEY };
 })(typeof window !== 'undefined' ? window : globalThis);

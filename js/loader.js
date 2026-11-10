@@ -18,7 +18,7 @@
   function show(title) {
     if (!overlay) init();
     if (titleEl) titleEl.textContent = title || 'Loading...';
-    if (bar) bar.style.width = '0%';
+    if (bar) bar.style.transform = 'scaleX(0)';
     if (label) label.textContent = '';
     overlay.classList.add('visible');
     overlay.setAttribute('aria-hidden', 'false');
@@ -33,7 +33,7 @@
   function setProgress(pct, stage) {
     if (!overlay) init();
     const p = Math.max(0, Math.min(100, pct));
-    if (bar) bar.style.width = p + '%';
+    if (bar) bar.style.transform = 'scaleX(' + (p / 100) + ')';
     if (label && stage != null) label.textContent = stage;
   }
 

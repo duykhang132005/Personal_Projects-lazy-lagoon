@@ -336,6 +336,7 @@
 
   function unmount() {
     clearInterval(timerId);
+    hideOverlay();
   }
 
   global.MinesweeperGame = { mount, unmount, refreshLobbyStats, DIFFS, bestKey };

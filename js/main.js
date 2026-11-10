@@ -156,6 +156,10 @@
       new MutationObserver(() => {
         if (ov.getAttribute('aria-hidden') === 'false') {
           if (!previous) remember();
+          if (!ov.contains(document.activeElement)) {
+            const first = overlayFocusable(ov)[0];
+            if (first) first.focus({ preventScroll: true });
+          }
           return;
         }
         const active = document.activeElement;
@@ -169,6 +173,80 @@
         }
         previous = null;
       }).observe(ov, { attributes: true, attributeFilter: ['aria-hidden'] });
+    });
+  }
+
+  // Escape dismisses the topmost visible game overlay without starting a new run:
+  // Resume if that button is showing, else Keep going, else Exit (lobby). Never Again.
+  // Skips leaderboard/loader (handled elsewhere) and typing in score-name fields.
+  function overlayFocusable(ov) {
+    return Array.from(ov.querySelectorAll('button, input, select, textarea, a[href], [tabindex]:not([tabindex="-1"])')).filter((el) => {
+      if (el.disabled) return false;
+      if (el.closest('[hidden]')) return false;
+      const st = window.getComputedStyle(el);
+      if (st.display === 'none' || st.visibility === 'hidden') return false;
+      return el.getClientRects().length > 0;
+    });
+  }
+
+  // Tab stays inside the visible game overlay, matching the leaderboard trap.
+  // Yields to the leaderboard and loader when those are open.
+  function bindOverlayTabTrap() {
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab') return;
+      const lb = document.getElementById('lb-overlay');
+      if (lb && lb.getAttribute('aria-hidden') === 'false') return;
+      const loader = document.getElementById('loader-overlay');
+      if (loader && loader.getAttribute('aria-hidden') === 'false') return;
+      const ov = [...document.querySelectorAll('.overlay')].find((o) => {
+        if (o.id === 'lb-overlay' || o.id === 'loader-overlay') return false;
+        return o.getAttribute('aria-hidden') === 'false' && o.classList.contains('visible');
+      });
+      if (!ov) return;
+      const items = overlayFocusable(ov);
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (!ov.contains(document.activeElement)) {
+        e.preventDefault();
+        (e.shiftKey ? last : first).focus();
+      } else if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }, true);
+  }
+
+  function bindOverlayEscape() {
+    document.addEventListener('keydown', (e) => {
+      if (e.key !== 'Escape' || e.defaultPrevented) return;
+      const tag = e.target && e.target.tagName ? e.target.tagName.toLowerCase() : '';
+      if (tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable)) return;
+      const lb = document.getElementById('lb-overlay');
+      if (lb && lb.getAttribute('aria-hidden') === 'false') return;
+      const loader = document.getElementById('loader-overlay');
+      if (loader && loader.getAttribute('aria-hidden') === 'false') return;
+      const toast = document.getElementById('update-toast');
+      if (toast && toast.contains(e.target)) return;
+      const ov = [...document.querySelectorAll('.overlay')].find((o) => {
+        if (o.id === 'lb-overlay' || o.id === 'loader-overlay') return false;
+        return o.getAttribute('aria-hidden') === 'false' && o.classList.contains('visible');
+      });
+      if (!ov) return;
+      const pick = (sel) => {
+        const el = ov.querySelector(sel);
+        if (!el) return null;
+        const st = window.getComputedStyle(el);
+        if (st.display === 'none' || st.visibility === 'hidden') return null;
+        return el;
+      };
+      const btn = pick('[id$="-resume"]') || pick('[id$="-continue"]') || pick('[id$="-exit"]');
+      if (!btn) return;
+      e.preventDefault();
+      btn.click();
     });
   }
 
@@ -237,6 +315,8 @@
 
   async function init() {
     bindOverlayFocus();
+    bindOverlayTabTrap();
+    bindOverlayEscape();
     LazyLoader.init();
     registerServiceWorker();
     if (window.LazyLeaderboard) {

@@ -18,6 +18,7 @@
   --mono: "Cascadia Code", "Consolas", ui-monospace, monospace;
   --glass: rgba(4, 16, 24, 0.72);
   --glass-strong: rgba(4, 18, 26, 0.88);
+  --placeholder: #5e9a73;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -412,11 +413,13 @@ a:hover { text-shadow: var(--neon-glow); }
 
 #loader-overlay .progress-bar {
   height: 100%;
-  width: 0%;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
   background: linear-gradient(90deg, var(--neon-dim), var(--neon));
   box-shadow: 0 0 12px var(--neon);
   border-radius: 999px;
-  transition: width 0.15s ease;
+  transition: transform 0.15s ease;
 }
 
 #loader-overlay .stage-label {
@@ -517,7 +520,7 @@ a:hover { text-shadow: var(--neon-glow); }
 .ms-cell.n7 { color: #e8ffe8; }
 .ms-cell.n8 { color: #8899aa; }
 
-.ms-board.hard .ms-cell { width: 22px; height: 22px; font-size: 0.72rem; }
+.ms-board.hard .ms-cell { width: 24px; height: 24px; font-size: 0.72rem; }
 .ms-board.medium .ms-cell { width: 24px; height: 24px; font-size: 0.78rem; }
 
 .diff-group {
@@ -630,7 +633,8 @@ a:hover { text-shadow: var(--neon-glow); }
   .site-header { flex-wrap: wrap; }
   .brand-title { font-size: 1.2rem; }
   .ms-cell { width: 26px; height: 26px; }
-  .ms-board.hard .ms-cell { width: 18px; height: 18px; font-size: 0.65rem; }
+  .ms-board.hard .ms-cell { width: 24px; height: 24px; font-size: 0.72rem; }
+  .btn-sm { min-height: 44px; padding: 0.45rem 0.9rem; }
 }
 
 /* Score submit (game-end overlays) */
@@ -669,7 +673,7 @@ a:hover { text-shadow: var(--neon-glow); }
   box-shadow: inset 0 0 12px rgba(57, 255, 20, 0.06);
 }
 
-.score-name::placeholder { color: #3d6a4a; }
+.score-name::placeholder { color: var(--placeholder); }
 .score-name:focus {
   outline: none;
   border-color: var(--neon);

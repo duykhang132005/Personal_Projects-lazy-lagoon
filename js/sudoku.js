@@ -451,6 +451,7 @@
 
   function unmount() {
     stopTimer();
+    hideOverlay();
   }
 
   global.SudokuGame = {
