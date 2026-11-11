@@ -149,6 +149,12 @@
     });
   }
 
+  function resolvePair(cardA, cardB, matchedSoFar, pairCount) {
+    const match = !!(cardA && cardB && cardA.symbol === cardB.symbol);
+    const matchedCount = match ? matchedSoFar + 1 : matchedSoFar;
+    return { match, matchedCount, complete: match && matchedCount >= pairCount };
+  }
+
   function flip(i) {
     if (won || locked) return;
     const card = cards[i];
@@ -164,13 +170,14 @@
     updateHud();
     const a = cards[flipped[0]];
     const b = cards[flipped[1]];
-    if (a.symbol === b.symbol) {
+    const result = resolvePair(a, b, matched, pairCount);
+    if (result.match) {
       a.matched = true;
       b.matched = true;
       flipped = [];
-      matched += 1;
+      matched = result.matchedCount;
       render();
-      if (matched >= pairCount) win();
+      if (result.complete) win();
     } else {
       locked = true;
       const pending = flipped.slice();
@@ -305,4 +312,8 @@
   }
 
   global.MemoryGame = { mount, unmount, refreshLobbyStats, DIFFS, bestKey };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { resolvePair };
+  }
 })(typeof window !== 'undefined' ? window : globalThis);

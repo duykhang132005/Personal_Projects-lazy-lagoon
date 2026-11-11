@@ -27,7 +27,7 @@ jobs:
           node-version: lts/*
           package-manager-cache: false
 
-      - name: Static checks and cache version guard (npm run check)
+      - name: Static checks, gameplay tests, and cache version guard (npm run check)
         env:
           CHECK_BASE: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
         run: npm run check

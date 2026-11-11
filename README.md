@@ -69,12 +69,14 @@ lazy-lagoon/
   manifest.webmanifest
   sw.js         # service worker (offline play)
   tools/smoke-test.js   # dev-only, not part of the site
+  tools/run-tests.js    # runs the gameplay tests
+  tests/                # gameplay unit tests (node:test)
   .github/workflows/smoke-test.yml
 ```
 
 Plain HTML, CSS, and JS. No build step.
 
-Before pushing, run `npm run check` (static checks plus the service worker cache-version guard, no dependencies).
+Before pushing, run `npm run check` (static checks, gameplay tests, and the service worker cache-version guard, no dependencies). To run only the gameplay tests, use `npm test`.
 
 ## Accessibility
 

@@ -465,4 +465,8 @@
     countSolutions,
     DIFF,
   };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { canPlace };
+  }
 })(typeof window !== 'undefined' ? window : globalThis);

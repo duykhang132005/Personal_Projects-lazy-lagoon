@@ -2,6 +2,7 @@
   "name": "lazy-lagoon",
   "private": true,
   "scripts": {
-    "check": "node tools/check.js"
+    "check": "node tools/check.js",
+    "test": "node tools/run-tests.js"
   }
 }

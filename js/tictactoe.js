@@ -37,7 +37,7 @@
    * Win if any 3 of player's magic numbers sum to 15.
    * Returns winning cell indices or null.
    */
-  function findWin(player) {
+  function findWinOn(board, player) {
     const idxs = [];
     for (let i = 0; i < 9; i++) if (board[i] === player) idxs.push(i);
     if (idxs.length < 3) return null;
@@ -54,8 +54,16 @@
     return null;
   }
 
+  function findWin(player) {
+    return findWinOn(board, player);
+  }
+
+  function isDrawOn(board) {
+    return board.every((c) => c != null) && !findWinOn(board, 'X') && !findWinOn(board, 'O');
+  }
+
   function isDraw() {
-    return board.every((c) => c != null) && !findWin('X') && !findWin('O');
+    return isDrawOn(board);
   }
 
   function statusText() {
@@ -305,4 +313,8 @@
       return r;
     },
   };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { MAGIC, WIN_SUM, findWinOn, isDrawOn };
+  }
 })(typeof window !== 'undefined' ? window : globalThis);

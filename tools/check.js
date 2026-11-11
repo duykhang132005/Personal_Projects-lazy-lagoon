@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /*
  * Lazy Lagoon: one command for the pre-push checks (npm run check, or node tools/check.js).
- * Runs the static smoke checks, then the CACHE_VERSION guard against a base ref.
+ * Runs the static smoke checks, then the gameplay unit tests, then the CACHE_VERSION
+ * guard against a base ref.
  * Base: first argument, else CHECK_BASE env (CI passes the push or PR base sha), else @{u} or
  * origin/main. An explicit empty or all-zero base is handed through so the guard skips cleanly.
  * The pre-push hook in .githooks calls this same file. Node built-ins only.
@@ -33,6 +34,12 @@ function rev(ref) {
 console.log('check: static checks');
 if (run('tools/smoke-test.js', ['--static-only']) !== 0) {
   console.error('check: FAIL, static checks failed.');
+  process.exit(1);
+}
+
+console.log('check: gameplay tests');
+if (run('tools/run-tests.js', []) !== 0) {
+  console.error('check: FAIL, gameplay tests failed.');
   process.exit(1);
 }
 

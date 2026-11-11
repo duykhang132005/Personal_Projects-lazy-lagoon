@@ -1,15 +1,16 @@
 #!/bin/sh
 # Lazy Lagoon pre-push hook (enable once per clone: git config core.hooksPath .githooks).
-# Runs the static site checks and the CACHE_VERSION guard against the upstream, and
-# blocks the push if either fails. Skip once in an emergency with: git push --no-verify
+# Runs the static site checks, gameplay tests, and the CACHE_VERSION guard against the
+# upstream, and blocks the push if any step fails. Skip once in an emergency with:
+# git push --no-verify
 set -u
 
 root="$(git rev-parse --show-toplevel)" || exit 1
 cd "$root" || exit 1
 
 if ! command -v node >/dev/null 2>&1; then
-  echo "pre-push: node not found, skipping Lazy Lagoon checks."
-  exit 0
+  echo "pre-push: node not found. Install Node.js and retry, or skip once with: git push --no-verify"
+  exit 1
 fi
 
 if ! node tools/check.js; then

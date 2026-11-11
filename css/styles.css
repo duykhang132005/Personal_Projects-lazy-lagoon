@@ -278,6 +278,7 @@ a:hover { text-shadow: var(--neon-glow); }
 
 .game-card .stat {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 0.8rem;
   color: var(--neon-dim);
 }
@@ -313,6 +314,7 @@ a:hover { text-shadow: var(--neon-glow); }
 
 .stat-pill {
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 0.85rem;
   padding: 0.25rem 0.65rem;
   border-radius: 999px;
@@ -740,6 +742,7 @@ a:hover { text-shadow: var(--neon-glow); }
   width: 100%;
   border-collapse: collapse;
   font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
   font-size: 0.85rem;
 }
 
@@ -764,7 +767,7 @@ a:hover { text-shadow: var(--neon-glow); }
 }
 
 .lb-name { color: var(--text); }
-.lb-score { color: var(--neon); white-space: nowrap; }
+.lb-score { color: var(--neon); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .lb-date { color: var(--muted); white-space: nowrap; font-size: 0.78rem; }
 
 .lb-note { margin-top: 0.75rem; }

@@ -271,4 +271,8 @@
   }
 
   global.Game2048 = { mount, unmount, refreshLobbyStats, BEST_KEY };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { SIZE, slideLine };
+  }
 })(typeof window !== 'undefined' ? window : globalThis);

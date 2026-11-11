@@ -643,4 +643,8 @@
     emptyBoard,
     normalizeBoard,
   };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { MAX_ENTRIES, lowerBetter, sortList, qualifies, emptyBoard, getList, setList };
+  }
 })(typeof window !== 'undefined' ? window : globalThis);

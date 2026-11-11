@@ -44,6 +44,42 @@
     updateHud();
   }
 
+  function countAdjacent(grid, rows, cols, r, c) {
+    let n = 0;
+    for (let dr = -1; dr <= 1; dr++) {
+      for (let dc = -1; dc <= 1; dc++) {
+        if (!dr && !dc) continue;
+        const rr = r + dr, cc = c + dc;
+        if (rr >= 0 && rr < rows && cc >= 0 && cc < cols && grid[rr][cc].mine) n++;
+      }
+    }
+    return n;
+  }
+
+  function floodReveal(grid, rows, cols, r, c) {
+    const newly = [];
+    const stack = [[r, c]];
+    while (stack.length) {
+      const [cr, cc] = stack.pop();
+      const cur = grid[cr][cc];
+      if (cur.revealed || cur.flagged) continue;
+      cur.revealed = true;
+      newly.push([cr, cc]);
+      if (cur.adj === 0) {
+        for (let dr = -1; dr <= 1; dr++) {
+          for (let dc = -1; dc <= 1; dc++) {
+            const rr = cr + dr, ccc = cc + dc;
+            if (rr >= 0 && rr < rows && ccc >= 0 && ccc < cols) {
+              const n = grid[rr][ccc];
+              if (!n.revealed && !n.flagged && !n.mine) stack.push([rr, ccc]);
+            }
+          }
+        }
+      }
+    }
+    return newly;
+  }
+
   function placeMines(safeR, safeC) {
     let placed = 0;
     while (placed < mineCount) {
@@ -57,15 +93,7 @@
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         if (grid[r][c].mine) continue;
-        let n = 0;
-        for (let dr = -1; dr <= 1; dr++) {
-          for (let dc = -1; dc <= 1; dc++) {
-            if (!dr && !dc) continue;
-            const rr = r + dr, cc = c + dc;
-            if (rr >= 0 && rr < rows && cc >= 0 && cc < cols && grid[rr][cc].mine) n++;
-          }
-        }
-        grid[r][c].adj = n;
+        grid[r][c].adj = countAdjacent(grid, rows, cols, r, c);
       }
     }
   }
@@ -121,25 +149,7 @@
       return;
     }
 
-    const stack = [[r, c]];
-    while (stack.length) {
-      const [cr, cc] = stack.pop();
-      const cur = grid[cr][cc];
-      if (cur.revealed || cur.flagged) continue;
-      cur.revealed = true;
-      revealed++;
-      if (cur.adj === 0) {
-        for (let dr = -1; dr <= 1; dr++) {
-          for (let dc = -1; dc <= 1; dc++) {
-            const rr = cr + dr, ccc = cc + dc;
-            if (rr >= 0 && rr < rows && ccc >= 0 && ccc < cols) {
-              const n = grid[rr][ccc];
-              if (!n.revealed && !n.flagged && !n.mine) stack.push([rr, ccc]);
-            }
-          }
-        }
-      }
-    }
+    revealed += floodReveal(grid, rows, cols, r, c).length;
 
     checkWin();
     render();
@@ -340,4 +350,8 @@
   }
 
   global.MinesweeperGame = { mount, unmount, refreshLobbyStats, DIFFS, bestKey };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { countAdjacent, floodReveal };
+  }
 })(typeof window !== 'undefined' ? window : globalThis);
