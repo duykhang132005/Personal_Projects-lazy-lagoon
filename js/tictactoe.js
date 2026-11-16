@@ -305,13 +305,6 @@
     unmount,
     MAGIC,
     WIN_SUM,
-    _testFindWin(b, player) {
-      const prev = board;
-      board = b;
-      const r = findWin(player);
-      board = prev;
-      return r;
-    },
   };
 
   if (typeof module !== 'undefined' && module.exports) {

@@ -1,6 +1,6 @@
 const { describe, test } = require('node:test');
 const assert = require('node:assert/strict');
-const { SIZE, slideLine } = require('../js/2048.js');
+const { SIZE, slideLine, isOverlayOpen } = require('../js/2048.js');
 
 function slide(values) {
   const line = values.slice();
@@ -32,5 +32,25 @@ describe('2048 slideLine', () => {
   test('slides tiles without merging different values', () => {
     assert.deepEqual(slide([2, 0, 4, 0]), [2, 4, 0, 0]);
     assert.deepEqual(slide([2, 4, 8, 16]), [2, 4, 8, 16]);
+  });
+});
+
+function fakeOverlay(visible, ariaHidden) {
+  return {
+    classList: { contains: (name) => name === 'visible' && !!visible },
+    getAttribute: (name) => (name === 'aria-hidden' ? ariaHidden : null),
+  };
+}
+
+describe('2048 overlay blocks moves', () => {
+  test('is closed when the overlay is missing, hidden, or aria-hidden', () => {
+    assert.equal(isOverlayOpen(null), false);
+    assert.equal(isOverlayOpen(fakeOverlay(false, 'true')), false);
+    assert.equal(isOverlayOpen(fakeOverlay(true, 'true')), false);
+    assert.equal(isOverlayOpen(fakeOverlay(false, 'false')), false);
+  });
+
+  test('is open only when the overlay is visible and aria-hidden is false', () => {
+    assert.equal(isOverlayOpen(fakeOverlay(true, 'false')), true);
   });
 });

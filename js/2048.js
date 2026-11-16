@@ -115,9 +115,15 @@
     return { line: out, gained };
   }
 
+  function isOverlayOpen(ov) {
+    if (!ov) return false;
+    return ov.classList.contains('visible') && ov.getAttribute('aria-hidden') === 'false';
+  }
+
   function move(dir) {
     // dir: 'left' | 'right' | 'up' | 'down'
     if (over) return;
+    if (isOverlayOpen(document.getElementById('t48-overlay'))) return;
     const prev = grid.map((row) => row.slice());
     let gained = 0;
 
@@ -273,6 +279,6 @@
   global.Game2048 = { mount, unmount, refreshLobbyStats, BEST_KEY };
 
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { SIZE, slideLine };
+    module.exports = { SIZE, slideLine, isOverlayOpen };
   }
 })(typeof window !== 'undefined' ? window : globalThis);
