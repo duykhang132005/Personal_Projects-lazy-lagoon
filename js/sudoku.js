@@ -361,11 +361,17 @@
     ov.setAttribute('aria-hidden', 'true');
   }
 
+  function isOverlayOpen(ov) {
+    if (!ov) return false;
+    return ov.classList.contains('visible') && ov.getAttribute('aria-hidden') === 'false';
+  }
+
   function onKey(e) {
     const view = document.getElementById('view-sudoku');
     if (!view || !view.classList.contains('active') || !user) return;
     const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
     if (tag === 'input' || tag === 'textarea' || (e.target && e.target.isContentEditable)) return;
+    if (isOverlayOpen(document.getElementById('sudoku-overlay'))) return;
     const k = e.key;
     if (k >= '1' && k <= '9') {
       e.preventDefault();
@@ -467,6 +473,6 @@
   };
 
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { canPlace };
+    module.exports = { canPlace, isOverlayOpen };
   }
 })(typeof window !== 'undefined' ? window : globalThis);

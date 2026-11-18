@@ -1,6 +1,6 @@
 const { describe, test } = require('node:test');
 const assert = require('node:assert/strict');
-const { canPlace } = require('../js/sudoku.js');
+const { canPlace, isOverlayOpen } = require('../js/sudoku.js');
 
 function empty() {
   return Array(81).fill(0);
@@ -33,5 +33,25 @@ describe('Sudoku canPlace', () => {
     assert.equal(canPlace(board, 10, 6), true);
     // r2c4 is a different row, column, and box, so 5 is allowed
     assert.equal(canPlace(board, 12, 5), true);
+  });
+});
+
+function fakeOverlay(visible, ariaHidden) {
+  return {
+    classList: { contains: (name) => name === 'visible' && !!visible },
+    getAttribute: (name) => (name === 'aria-hidden' ? ariaHidden : null),
+  };
+}
+
+describe('Sudoku overlay blocks keys', () => {
+  test('is closed when the overlay is missing, hidden, or aria-hidden', () => {
+    assert.equal(isOverlayOpen(null), false);
+    assert.equal(isOverlayOpen(fakeOverlay(false, 'true')), false);
+    assert.equal(isOverlayOpen(fakeOverlay(true, 'true')), false);
+    assert.equal(isOverlayOpen(fakeOverlay(false, 'false')), false);
+  });
+
+  test('is open only when the overlay is visible and aria-hidden is false', () => {
+    assert.equal(isOverlayOpen(fakeOverlay(true, 'false')), true);
   });
 });
