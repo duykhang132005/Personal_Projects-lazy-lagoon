@@ -410,6 +410,11 @@
     if (!running && !over) launch();
   }
 
+  function isOverlayOpen(ov) {
+    if (!ov) return false;
+    return ov.classList.contains('visible') && ov.getAttribute('aria-hidden') === 'false';
+  }
+
   function onKey(e) {
     const view = document.getElementById('view-breakout');
     if (!view || !view.classList.contains('active')) return;
@@ -427,7 +432,10 @@
       if (e.type === 'keydown') launch();
     } else if (k === ' ' || e.code === 'Space' || k === 'arrowup' || k === 'w') {
       if (e.type === 'keydown') {
-        if (over) reset();
+        if (over) {
+          if (isOverlayOpen(document.getElementById('breakout-overlay'))) return;
+          reset();
+        }
         else if (paused) togglePause();
         else if (!running) launch();
         else togglePause();
@@ -520,4 +528,8 @@
   }
 
   global.BreakoutGame = { mount, unmount, refreshLobbyStats, BEST_KEY };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { isOverlayOpen };
+  }
 })(typeof window !== 'undefined' ? window : globalThis);

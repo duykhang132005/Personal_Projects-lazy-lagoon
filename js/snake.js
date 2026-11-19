@@ -228,6 +228,11 @@
     ov.setAttribute('aria-hidden', 'true');
   }
 
+  function isOverlayOpen(ov) {
+    if (!ov) return false;
+    return ov.classList.contains('visible') && ov.getAttribute('aria-hidden') === 'false';
+  }
+
   function onKey(e) {
     if (!wrap || !wrap.classList.contains('active')) return;
     const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
@@ -241,7 +246,10 @@
     else if (k === 'arrowleft' || k === 'a') setDir(-1, 0);
     else if (k === 'arrowright' || k === 'd') setDir(1, 0);
     else if (k === ' ' || e.code === 'Space') {
-      if (dead) { reset(); }
+      if (dead) {
+        if (isOverlayOpen(document.getElementById('snake-overlay'))) return;
+        reset();
+      }
       else if (!running) { /* wait for arrow/WASD/D-pad - same as Play Again */ }
       else pause();
     }
@@ -315,4 +323,8 @@
   }
 
   global.SnakeGame = { mount, unmount, refreshLobbyStats, BEST_KEY };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { isOverlayOpen };
+  }
 })(typeof window !== 'undefined' ? window : globalThis);

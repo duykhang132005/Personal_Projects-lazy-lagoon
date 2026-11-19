@@ -664,10 +664,14 @@ a:hover { text-shadow: var(--neon-glow); }
 }
 
 .score-name::placeholder { color: var(--placeholder); }
-.score-name:focus {
-  outline: none;
+.score-name:focus-visible {
+  outline: 2px solid var(--neon);
+  outline-offset: 2px;
   border-color: var(--neon);
   box-shadow: var(--neon-glow);
+}
+.score-name:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .score-submit-msg {
@@ -745,7 +749,6 @@ a:hover { text-shadow: var(--neon-glow); }
   color: var(--neon);
   font-weight: 600;
   font-size: 0.75rem;
-  text-transform: uppercase;
   letter-spacing: 0.04em;
 }
 
